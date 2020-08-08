@@ -1,0 +1,8 @@
+{
+  "name": "react-native-selectable-text",    
+  "main": "index.js",  
+  "keywords": [
+    "react-native"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,36 @@
+const colors = {
+  dark: {
+    primary: '#CE171E',
+    background: 'white',
+    lightPrimary: '#f28c90',
+    secondaryBackground: '#F4F4F2',
+    text: '#FFFFFF',
+    border: '#0000004D',
+    lightBorder: '#E8E8E8',
+    neutral: '#D2C7A2',
+    darkNeutral: '#7676801F',
+    neutral01: '#8D8070',
+    neutral02: '#CBC6BF',
+    s07: '#F09193',
+    m12: '#72ACC1',
+    m16: '#749486',
+  },
+  light: {
+    primary: '#CE171E',
+    background: 'white',
+    lightPrimary: '#f28c90',
+    secondaryBackground: '#F4F4F2',
+    text: '#000000',
+    border: '#0000004D',
+    lightBorder: '#E8E8E8',
+    neutral: '#D2C7A2',
+    darkNeutral: '#7676801F',
+    neutral01: '#8D8070',
+    neutral02: '#CBC6BF',
+    s07: '#F09193',
+    m12: '#72ACC1',
+    m16: '#749486',
+  },
+};
+
+export { colors };

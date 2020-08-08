@@ -1,0 +1,8 @@
+{
+  "name": "libs",
+  "devDependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/runtime": "^7.4.3",
+    "metro-react-native-babel-preset": "^0.53.1"
+  }
+}
