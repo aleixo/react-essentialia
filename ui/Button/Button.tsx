@@ -1,8 +1,13 @@
-import React, { useContext } from 'react';
+import React, { useContext } from "react";
 
-import { Text, StyleSheet, View, ViewStyle } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import context from '../context';
+import {
+  Text,
+  StyleSheet,
+  View,
+  ViewStyle,
+  TouchableOpacity,
+} from "react-native";
+import context from "../context";
 
 const computedStyle = (strech, size, round) => {
   let computedStyle = { view: {}, touchable: {} };
@@ -31,12 +36,12 @@ const computedStyle = (strech, size, round) => {
       view: {
         ...computedStyle.view,
         flex: 1,
-        flexDirection: 'column',
+        flexDirection: "column",
       },
       touchable: {
         ...computedStyle.touchable,
-        width: '100%',
-        height: '100%',
+        width: "100%",
+        height: "100%",
       },
     };
   }
@@ -90,11 +95,12 @@ const Button = ({
     <View
       style={{
         ...extraStyle.view,
-      }}>
+      }}
+    >
       <TouchableOpacity
         style={{
-          alignItems: align ? align : 'center',
-          justifyContent: 'center',
+          alignItems: align ? align : "center",
+          justifyContent: "center",
           borderWidth,
           borderColor,
           backgroundColor,
@@ -105,16 +111,18 @@ const Button = ({
           padding,
           ...extraStyle.touchable,
         }}
-        onPress={onPress}>
+        onPress={onPress}
+      >
         {children ? (
           title ? (
             <View
               style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               {children}
               <Text
                 style={{
@@ -122,7 +130,8 @@ const Button = ({
                   fontSize: textSize,
                   fontWeight: textWeight,
                   color: textColor,
-                }}>
+                }}
+              >
                 {title}
               </Text>
             </View>
@@ -135,8 +144,9 @@ const Button = ({
               fontSize: textSize,
               fontWeight: textWeight,
               color: textColor,
-              textAlign: round && 'center',
-            }}>
+              textAlign: round && "center",
+            }}
+          >
             {title}
           </Text>
         )}

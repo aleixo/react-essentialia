@@ -1,8 +1,7 @@
 {
-  "name": "libs",
-  "devDependencies": {
-    "@babel/core": "^7.4.3",
-    "@babel/runtime": "^7.4.3",
-    "metro-react-native-babel-preset": "^0.53.1"
+  "name": "react-native-iso-ui",
+  "peerDependencies": {
+    "react-native-render-html": "^4.2.2",
+    "react-native-webview": "^10.4.0"
   }
 }

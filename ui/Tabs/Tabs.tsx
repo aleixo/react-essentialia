@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { ViewStyle } from 'react-native';
-import { Button, View } from 'libs/ui';
+import React, { useState } from "react";
+import { ViewStyle } from "react-native";
+import { Button, View } from "../";
 
 interface Props {
   backgroundColor: string;
@@ -24,25 +24,27 @@ const Tabs = ({ backgroundColor, tabs, renderTab, containerStyle }: Props) => {
   return (
     <View
       style={{
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
         ...containerStyle,
-      }}>
+      }}
+    >
       <View
         style={{
-          flexDirection: 'row',
+          flexDirection: "row",
           borderRadius: 5,
           padding: 2,
-          justifyContent: 'space-evenly',
-          alignItems: 'center',
+          justifyContent: "space-evenly",
+          alignItems: "center",
           height: 28,
           backgroundColor,
-        }}>
+        }}
+      >
         {tabs.map((tab, index) => (
           <Button
             title={tab}
             backgroundColor={
-              state.selectedTab === tab ? 'white' : 'transparent'
+              state.selectedTab === tab ? "white" : "transparent"
             }
             onPress={() => selectTab(tab, index)}
             borderRadius={5}

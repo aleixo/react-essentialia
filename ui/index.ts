@@ -8,8 +8,12 @@ import LocalizedPopup from './LocalizedPopup';
 import Provider from './Provider';
 import Texts from './Texts';
 import useConfiguration from './useConfiguration';
+import TopBar from './TopBar';
+import FullScreenImage from './FullScreenImage';
 
 export {
+	FullScreenImage,
+	TopBar,
   useConfiguration,
   Texts,
   HtmlParser,
