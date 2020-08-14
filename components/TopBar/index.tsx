@@ -10,8 +10,20 @@ import {
 
 import styles from "./index.styles";
 
-class TopBar extends React.Component {
-  constructor(props) {
+interface ITopBar {
+  image: string | { uri: string };
+  backgroundColor: string;
+  toHeight: number;
+  fadeinDuration: number;
+  native?: boolean;
+  enable?: boolean;
+  fadeoutAfter?: number;
+  fadeoutDuration?: number;
+  fadeout?: boolean;
+}
+
+class TopBar extends React.Component<ITopBar> {
+  constructor(props: ITopBar) {
     super(props);
 
     this.state = {
@@ -141,7 +153,7 @@ class TopBar extends React.Component {
               height: fadeAnim,
               backgroundColor,
               opacity,
-	    },
+            },
           ]}
           {...(this.props.swipable && this._panResponder.panHandlers)}
         >

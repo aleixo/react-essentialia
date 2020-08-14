@@ -29,9 +29,6 @@ export interface state {
   familyName: string;
 }
 
-const componentNames = ['h1', 'h2', 'h3'];
-const allowedStyles = ['color', 'backgroundColor'];
-
 type textStyleExtensions = {
   color?: string;
   borderWidth?: string;
@@ -50,6 +47,11 @@ export interface styleExtensions {
   h6?: textStyleExtensions;
   paragraph?: textStyleExtensions;
   label?: textStyleExtensions;
+  button?: {
+    color?: string;
+    paddingHorizontal?: string;
+    paddingVertical?: string;
+  };
 }
 
 export interface context {

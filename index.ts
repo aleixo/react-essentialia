@@ -1,3 +1,4 @@
-import * as ui from "./ui";
+import * as UI from "./components";
+import Provider from "./Provider";
 
-export default ui;
+export { UI, Provider };

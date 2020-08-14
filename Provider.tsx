@@ -1,20 +1,22 @@
-import React, { useContext } from 'react';
-import { StyleSheet, ViewStyle } from 'react-native';
+import React, { useContext } from "react";
 
-import context from './context';
-import { objects } from '../helpers';
-import * as types from './types';
+import context from "./context";
+import { objects } from "./helpers";
+import { I18nProvider } from "./useI18n";
+
+import * as types from "./types";
 
 const ProviderContext = context.Provider;
-
 interface ProviderProps {
   children: any;
+  // UI
+  styleExtensions?: types.styleExtensions;
+  // Themes
   colors?: types.colors;
   sizes?: types.sizes;
-  layoutThemes?: {
-    [key: string]: ViewStyle;
-  };
-  styleExtensions?: types.styleExtensions;
+  // I18n
+  strings?: object;
+  initialLang: string;
 }
 
 const Provider = ({
@@ -22,15 +24,14 @@ const Provider = ({
   colors = {},
   sizes = {},
   styleExtensions = {},
-  layoutThemes = {},
+  strings = {},
+  initialLang,
 }: ProviderProps) => {
   const contextValues = useContext(context);
   const newSizes = objects.merge(contextValues.state.sizes, sizes);
   const newColors = objects.merge(contextValues.state.colors, colors);
 
   // Build native styles based on template given
-  const styles = StyleSheet.create(layoutThemes);
-
   const state = {
     ...contextValues,
     state: {
@@ -41,9 +42,11 @@ const Provider = ({
   };
 
   return (
-    <ProviderContext value={{ ...state, styles, styleExtensions }}>
-      {children}
-    </ProviderContext>
+    <I18nProvider lang={initialLang} strings={strings}>
+      <ProviderContext value={{ ...state, styleExtensions }}>
+        {children}
+      </ProviderContext>
+    </I18nProvider>
   );
 };
 

@@ -1,12 +1,8 @@
 import React, { useContext } from "react";
 
-import {
-  Text,
-  StyleSheet,
-  View,
-  ViewStyle,
-  TouchableOpacity,
-} from "react-native";
+import { View, TouchableOpacity, ButtonProps } from "react-native";
+
+import { UI } from "..";
 import context from "../context";
 
 const computedStyle = (strech, size, round) => {
@@ -48,15 +44,13 @@ const computedStyle = (strech, size, round) => {
   return computedStyle;
 };
 
-interface Props {
-  title?: string;
+interface Props extends ButtonProps {
   textColor?: string;
   backgroundColor?: string;
   borderWidth?: number;
   size?: number;
   width?: number;
   height?: number;
-  onPress?: Function;
   textSize?: number;
   textWeight?: string;
   round?: boolean;
@@ -88,6 +82,7 @@ const Button = ({
   borderRadius,
   align,
   padding,
+  ...props
 }: Props) => {
   const contextObj = useContext(context);
   const extraStyle = computedStyle(strech, size, round);
@@ -98,6 +93,7 @@ const Button = ({
       }}
     >
       <TouchableOpacity
+        {...props}
         style={{
           alignItems: align ? align : "center",
           justifyContent: "center",
@@ -110,46 +106,34 @@ const Button = ({
           height: height,
           padding,
           ...extraStyle.touchable,
+          ...props.style,
         }}
         onPress={onPress}
       >
-        {children ? (
-          title ? (
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {children}
-              <Text
-                style={{
-                  marginLeft: 5,
-                  fontSize: textSize,
-                  fontWeight: textWeight,
-                  color: textColor,
-                }}
-              >
-                {title}
-              </Text>
-            </View>
-          ) : (
-            children
-          )
-        ) : (
-          <Text
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal:
+              contextObj.styleExtensions?.button.paddingHorizontal,
+          }}
+        >
+          {children}
+          <UI.Text
             style={{
               fontSize: textSize,
               fontWeight: textWeight,
-              color: textColor,
               textAlign: round && "center",
+              color: textColor
+                ? textColor
+                : contextObj.styleExtensions?.button?.color,
             }}
           >
             {title}
-          </Text>
-        )}
+          </UI.Text>
+        </View>
       </TouchableOpacity>
     </View>
   );

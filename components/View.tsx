@@ -1,7 +1,8 @@
-import React, { useContext, useState } from 'react';
-import context from '../context';
-import { View as RNView, StyleSheet, ViewProps } from 'react-native';
-import { Uuid } from '../../helpers';
+import React, { useContext, useState } from "react";
+import { View as RNView, StyleSheet, ViewProps } from "react-native";
+
+import context from "../context";
+import { Uuid } from "../helpers";
 
 interface Props extends ViewProps {
   shadow?: Boolean;
@@ -11,8 +12,8 @@ interface Props extends ViewProps {
   size?: number;
   row?: boolean;
   flexWeight?: number;
-  xAlign?: 'center' | 'space-between' | 'flex-start' | 'flex-end' | 'stretch';
-  yAlign?: 'center' | 'space-between' | 'flex-start' | 'flex-end' | 'stretch';
+  xAlign?: "center" | "space-between" | "flex-start" | "flex-end" | "stretch";
+  yAlign?: "center" | "space-between" | "flex-start" | "flex-end" | "stretch";
   mb?: number;
   p?: number;
   m?: number;
@@ -37,19 +38,19 @@ const View = ({
   ...props
 }: Props) => {
   const contextValue = useContext(context);
-  const [name] = useState('view_' + Uuid());
+  const [name] = useState("view_" + Uuid());
 
   const DEFAULT_SHADOW_RADIUS = 2.62;
   const roundStyle = {
     width: size,
     height: size,
     borderRadius: size / 2,
-    justifyContent: 'center',
-    alignContent: 'center',
+    justifyContent: "center",
+    alignContent: "center",
   };
   const shadowStyle = {
-    backgroundColor: 'white',
-    shadowColor: '#000',
+    backgroundColor: "white",
+    shadowColor: "#000",
     shadowOffset: {
       width: 1,
       height: 1,
@@ -59,8 +60,8 @@ const View = ({
   };
 
   const structureStyle = {
-    display: 'flex',
-    flexDirection: row ? 'row' : 'column',
+    display: "flex",
+    flexDirection: row ? "row" : "column",
     justifyContent: xAlign,
     alignItems: yAlign,
     flex: flexWeight,
@@ -100,7 +101,8 @@ const View = ({
         contextValue.styles[name].round,
         contextValue.styles[name].customStyle,
         contextValue.styles[name].extensions,
-      ]}>
+      ]}
+    >
       {children}
     </RNView>
   );
