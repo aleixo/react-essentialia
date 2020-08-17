@@ -12,6 +12,6 @@ export const merge = (
 
 export const byString = (obj, path) => {
   var properties = path.split(".");
-  console.log("PROPERTIES", properties, obj);
+
   return properties.reduce((prev, curr) => prev && prev[curr], obj);
 };

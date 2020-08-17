@@ -1,13 +1,12 @@
 import React from "react";
-
-import { colors } from "./colors";
+import { colors } from "../types";
 
 export const context = React.createContext({
   state: {
-    dark: false,
-    colors: colors.light,
+    colors: { default: {} },
+    color: {},
     fontScale: 1,
-    subscribers: {},
+    theme: "default",
   },
   subscribers: {},
 });
@@ -16,24 +15,30 @@ const Provider = context.Provider;
 
 interface IProvider {
   children: any;
-  dark?: boolean;
-  colors: object;
+  theme?: string;
+  colors: colors;
   fontScale?: number;
+  sizes: {};
 }
 
 export const ThemeProvider = ({
   children,
   colors,
-  dark = false,
   fontScale = 1,
+  theme = "default",
+  sizes = {},
 }: IProvider) => {
+  console.log("PROVIDER");
   return (
     <Provider
       value={{
         state: {
-          dark: dark,
-          colors: colors.light,
-          fontScale: fontScale,
+          color: colors[theme],
+          originalSizes: sizes,
+          fontScale,
+          colors,
+          theme,
+          sizes,
         },
         subscribers: {},
       }}

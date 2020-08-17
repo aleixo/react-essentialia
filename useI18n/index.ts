@@ -1,4 +1,4 @@
-import useI18n from "./useI18n";
+import useI18n from "./hook";
 import { I18nProvider } from "./context";
 import { objects } from "../helpers";
 const getString = objects.byString;

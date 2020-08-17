@@ -1,16 +1,18 @@
-import React, { useContext } from "react";
+import React from "react";
 
 import context from "./context";
 import { objects } from "./helpers";
 import { I18nProvider } from "./useI18n";
-
+import { ThemeProvider } from "./useTheme";
 import * as types from "./types";
 
 const ProviderContext = context.Provider;
+
 interface ProviderProps {
   children: any;
   // UI
   styleExtensions?: types.styleExtensions;
+  familyName?: string;
   // Themes
   colors?: types.colors;
   sizes?: types.sizes;
@@ -21,31 +23,28 @@ interface ProviderProps {
 
 const Provider = ({
   children,
-  colors = {},
+  familyName,
+  initialLang,
+  colors = { default: {} },
   sizes = {},
   styleExtensions = {},
   strings = {},
-  initialLang,
 }: ProviderProps) => {
-  const contextValues = useContext(context);
-  const newSizes = objects.merge(contextValues.state.sizes, sizes);
-  const newColors = objects.merge(contextValues.state.colors, colors);
-
-  // Build native styles based on template given
-  const state = {
-    ...contextValues,
-    state: {
-      ...contextValues.state,
-      colors: newColors,
-      sizes: newSizes,
-    },
-  };
-
   return (
     <I18nProvider lang={initialLang} strings={strings}>
-      <ProviderContext value={{ ...state, styleExtensions }}>
-        {children}
-      </ProviderContext>
+      <ThemeProvider colors={colors} sizes={sizes}>
+        <ProviderContext
+          value={{
+            state: {
+              familyName,
+              styleExtensions,
+            },
+            subscribers: {},
+          }}
+        >
+          {children}
+        </ProviderContext>
+      </ThemeProvider>
     </I18nProvider>
   );
 };

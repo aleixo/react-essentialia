@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { View as RNView, StyleSheet, ViewProps } from "react-native";
+import { View as RNView, StyleSheet, ViewProps, ViewStyle } from "react-native";
 
 import context from "../context";
 import { Uuid } from "../helpers";
@@ -17,6 +17,7 @@ interface Props extends ViewProps {
   mb?: number;
   p?: number;
   m?: number;
+  style?: ViewStyle;
 }
 
 // TODO - Put styles in context and if the style already exists,
@@ -25,7 +26,6 @@ const View = ({
   shadow,
   shadowRadius,
   children,
-  style,
   round,
   row,
   xAlign,
@@ -35,6 +35,7 @@ const View = ({
   mb = 0,
   p = 0,
   m = 0,
+  style,
   ...props
 }: Props) => {
   const contextValue = useContext(context);
@@ -80,27 +81,25 @@ const View = ({
       margins: marginsStyle,
       shadow: shadow || shadowRadius ? shadowStyle : {},
       round: round ? roundStyle : {},
-      extensions: contextValue.styleExtensions.view,
+      extensions: contextValue.state.styleExtensions.view,
       customStyle: style,
     };
 
     return StyleSheet.create(styleObj);
   };
 
-  if (!contextValue.styles[name]) {
-    contextValue.styles[name] = createStylesheet();
-  }
+  const styles = createStylesheet();
 
   return (
     <RNView
       {...props}
       style={[
-        contextValue.styles[name].structure,
-        contextValue.styles[name].margins,
-        contextValue.styles[name].shadow,
-        contextValue.styles[name].round,
-        contextValue.styles[name].customStyle,
-        contextValue.styles[name].extensions,
+        styles.structure,
+        styles.margins,
+        styles.shadow,
+        styles.round,
+        styles.customStyle,
+        styles.extensions,
       ]}
     >
       {children}

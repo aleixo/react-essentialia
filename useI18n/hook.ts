@@ -1,17 +1,16 @@
 import { useContext, useState, useEffect } from "react";
 
 import { context } from "./context";
-import { state as stateType, context as contextType } from "./types";
-import { colors } from "./colors";
+import { II18nState as stateType, II18nContext as contextType } from "../types";
 
-import { Uuid } from "../helpers";
+import { Uuid, objects } from "../helpers";
 
 interface hookDispatcher {
-  toggleDarkMode(): Function;
-  changeFontScale(fontScale: number): Function;
+  setLanguage(newLanguage: string): void;
+  getString(path: string): string;
 }
 
-const useTheme = (): [stateType, hookDispatcher] => {
+const useI18n = (): [stateType, hookDispatcher] => {
   const contextValue = useContext<contextType>(context);
 
   const [subscriptionId] = useState(Uuid());
@@ -32,31 +31,29 @@ const useTheme = (): [stateType, hookDispatcher] => {
 
   const dispatchSubscribers = (newState) => {
     Object.keys(contextValue.subscribers).forEach((key: string) => {
-      contextValue.subscribers[key](newState);
+      contextValue.subscribers[key]({ ...state, ...newState });
     });
   };
 
-  const toggleDarkMode = () => {
+  const setLanguage = (newLanguage) => {
     dispatchSubscribers({
-      ...state,
-      dark: !state.dark,
-      colors: !state.dark ? colors.light : colors.dark,
+      lang: newLanguage,
     });
   };
 
-  const changeFontScale = (fontScale: number) => {
-    dispatchSubscribers({
-      ...state,
-      fontScale,
-    });
+  const getString = (path) => {
+    if (typeof path !== "string") {
+      return path;
+    }
+    return objects.byString(state.strings[state.lang], path);
   };
 
   const dispatcher = {
-    toggleDarkMode,
-    changeFontScale,
+    setLanguage,
+    getString,
   };
 
   return [state, dispatcher];
 };
 
-export default useTheme;
+export default useI18n;

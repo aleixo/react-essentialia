@@ -3,7 +3,8 @@ import { Text as RNText, TextProps } from "react-native";
 
 import * as types from "../types";
 import context from "../context";
-import useI18n, { getString } from "../useI18n";
+import useI18n from "../useI18n";
+import useTheme from "../useTheme";
 
 interface Props extends TextProps {
   children: any;
@@ -21,7 +22,11 @@ interface Props extends TextProps {
 
 const defaults = {};
 
-const buildStyle = ({ colors, sizes }: types.state, name: string, opts) => {
+const buildStyle = (
+  { color, sizes }: types.IThemeState,
+  name: string,
+  opts
+) => {
   const fontWeight = (bold: boolean) => {
     if (bold) {
       return "bold";
@@ -50,7 +55,7 @@ const buildStyle = ({ colors, sizes }: types.state, name: string, opts) => {
   };
 
   const componentDefault = {
-    color: colors.text,
+    color: color.text,
     fontSize: sizes[sizeMapper[name]],
     fontFamily: undefined,
     borderWidth: 0,
@@ -76,20 +81,22 @@ export default ({
   label,
   ...props
 }: Props) => {
-  const [i18n, i18nDispatcher] = useI18n();
+  const [, i18nDispatcher] = useI18n();
+  const [themeState] = useTheme();
+  const contextObj = useContext(context);
 
   const ownChildren = i18nDispatcher.getString(children) || children;
+
   const sizesObject = { h1, h2, h3, h4, h5, h6, paragraph, label };
   const size = Object.keys(sizesObject).find((key) => sizesObject[key]) || "h1";
 
-  const contextObj = useContext(context);
-  const styles = buildStyle(contextObj.state, size, { bold });
+  const styles = buildStyle(themeState, size, { bold });
   return (
     <RNText
       {...props}
       style={{
         ...styles,
-        ...contextObj.styleExtensions?.[size],
+        ...contextObj.state.styleExtensions?.[size],
         ...props.style,
       }}
     >

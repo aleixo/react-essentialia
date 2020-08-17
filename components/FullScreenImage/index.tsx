@@ -2,16 +2,25 @@ import React from "react";
 import {
   Modal,
   View,
-  TouchableOpacity,
   TouchableHighlight,
   StyleSheet,
   Dimensions,
   Image,
 } from "react-native";
 
-import { colors } from "resources";
+interface IFullScreenImage {
+  visible?: boolean;
+  image?: string;
+  backgroundColor: string;
+  close(): void;
+}
 
-export default ({ visible, image, close }) => {
+export default ({
+  visible,
+  image,
+  close,
+  backgroundColor,
+}: IFullScreenImage) => {
   return (
     <Modal animationType="fade" transparent visible={visible}>
       <View
@@ -20,7 +29,7 @@ export default ({ visible, image, close }) => {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "stretch",
-          backgroundColor: colors.CUSTOM_BLACK_OVERLAY(0.5),
+          backgroundColor: backgroundColor,
         }}
       >
         <TouchableHighlight onPress={close}>
@@ -35,7 +44,7 @@ export default ({ visible, image, close }) => {
               style={{
                 width: undefined,
                 height: undefined,
-                backgroundColor: colors.CUSTOM_BLACK_OVERLAY(0.5),
+                backgroundColor: backgroundColor,
                 ...StyleSheet.absoluteFillObject,
               }}
               source={image}

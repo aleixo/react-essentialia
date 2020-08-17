@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 
 import { View, TouchableOpacity, ButtonProps } from "react-native";
 
-import { UI } from "..";
+import Text from "./Text";
 import context from "../context";
 
 const computedStyle = (strech, size, round) => {
@@ -121,7 +121,7 @@ const Button = ({
           }}
         >
           {children}
-          <UI.Text
+          <Text
             style={{
               fontSize: textSize,
               fontWeight: textWeight,
@@ -132,7 +132,7 @@ const Button = ({
             }}
           >
             {title}
-          </UI.Text>
+          </Text>
         </View>
       </TouchableOpacity>
     </View>

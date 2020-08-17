@@ -1,14 +1,13 @@
-export interface colors {
+export interface IColor {
   primary?: string;
   secondary?: string;
   neutral?: string;
   background?: string;
   text?: string;
 }
-
-export interface themes {
-  primary: Object;
-  secondary: Object;
+export interface colors {
+  default: IColor;
+  [key: string]: IColor;
 }
 
 export interface sizes {
@@ -20,13 +19,6 @@ export interface sizes {
   XXS?: number;
   paragraph?: number;
   label?: number;
-}
-
-export interface state {
-  colors: colors;
-  themes: themes;
-  sizes: sizes;
-  familyName: string;
 }
 
 type textStyleExtensions = {
@@ -49,16 +41,43 @@ export interface styleExtensions {
   label?: textStyleExtensions;
   button?: {
     color?: string;
-    paddingHorizontal?: string;
-    paddingVertical?: string;
+    paddingHorizontal?: number;
+    paddingVertical?: number;
   };
+}
+
+export interface state {
+  familyName: string;
+  styleExtensions?: styleExtensions;
 }
 
 export interface context {
   state: state;
   subscribers: object;
-  styles: {
-    [key: string]: object;
-  };
-  styleExtensions?: styleExtensions;
+}
+
+// THEME
+export interface IThemeState {
+  theme: string;
+  color: IColor;
+  colors: colors;
+  fontScale: number;
+  sizes: sizes;
+  originalSizes: sizes;
+}
+
+export interface IThemeContext {
+  state: IThemeState;
+  subscribers: {};
+}
+
+// I18n
+export interface II18nState {
+  lang: string;
+  strings: object;
+}
+
+export interface II18nContext {
+  state: state;
+  subscribers: {};
 }

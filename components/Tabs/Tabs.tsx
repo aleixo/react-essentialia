@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { ViewStyle } from "react-native";
-import { Button, View } from "../";
+
+import Button from "../Button";
+import View from "../View";
 
 interface Props {
   backgroundColor: string;
