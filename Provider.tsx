@@ -5,7 +5,7 @@ import { objects } from "./helpers";
 import { I18nProvider } from "./useI18n";
 import { ThemeProvider } from "./useTheme";
 import * as types from "./types";
-
+import { defaultSizes } from "./defaults";
 const ProviderContext = context.Provider;
 
 interface ProviderProps {
@@ -19,18 +19,18 @@ interface ProviderProps {
   theme?: string;
   // I18n
   strings?: object;
-  initialLang: string;
+  initialLang?: string;
 }
 
 const Provider = ({
   children,
   familyName,
-  styleExtensions = {},
-  colors,
-  sizes,
-  strings,
-  initialLang,
+  colors = { default: {} },
   theme,
+  initialLang = "",
+  sizes = defaultSizes,
+  styleExtensions = {},
+  strings = {},
 }: ProviderProps) => {
   return (
     <I18nProvider lang={initialLang} strings={strings}>

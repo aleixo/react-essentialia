@@ -53,11 +53,13 @@ const View = ({
     backgroundColor: "white",
     shadowColor: "#000",
     shadowOffset: {
-      width: 1,
-      height: 1,
+      width: 0,
+      height: 8,
     },
-    shadowOpacity: 0.33,
-    shadowRadius: shadowRadius || DEFAULT_SHADOW_RADIUS,
+    shadowOpacity: 0.46,
+    shadowRadius: 11.14,
+
+    elevation: 17,
   };
 
   const structureStyle = {

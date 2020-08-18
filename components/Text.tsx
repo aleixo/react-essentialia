@@ -53,7 +53,7 @@ const buildStyle = (
     label: "label",
     paragraph: "paragraph",
   };
-
+console.log(sizes)
   const componentDefault = {
     color: color.text,
     fontSize: sizes[sizeMapper[name]],

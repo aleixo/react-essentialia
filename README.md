@@ -1,5 +1,10 @@
 # Usage
 
+# Peer Dependencies
+
+- "react-native-render-html": "^4.2.2",
+- "react-native-webview": "^10.4.0"
+
 # Roadmap
 
 - [x] Support i18n (multiple language, change language, arguments to i18n strings)
@@ -9,6 +14,7 @@
 - [ ] Code must be easily maintanable with the proper layers
 - [ ] Add Cell component and several variants
 - [ ] Change name to react-native-essentialia
+- [ ] Allow to dispatch only from inner hooks
 - [ ] Manage forms
 - [ ] Add Docs
 - [ ] Storybook or sample app

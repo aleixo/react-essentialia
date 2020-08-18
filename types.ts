@@ -50,7 +50,7 @@ export interface styleExtensions {
 }
 
 export interface state {
-  familyName: string;
+  familyName?: string;
   styleExtensions?: styleExtensions;
 }
 
@@ -59,6 +59,7 @@ export interface context {
   subscribers: object;
 }
 
+// -------------------- HOOKS
 // THEME
 export interface IThemeState {
   theme: string;
