@@ -23,12 +23,11 @@ interface IProvider {
 
 export const ThemeProvider = ({
   children,
-  colors,
+  colors = { default: {} },
   fontScale = 1,
   theme = "default",
   sizes = {},
 }: IProvider) => {
-  console.log("PROVIDER");
   return (
     <Provider
       value={{

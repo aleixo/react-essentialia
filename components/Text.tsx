@@ -83,6 +83,7 @@ export default ({
 }: Props) => {
   const [, i18nDispatcher] = useI18n();
   const [themeState] = useTheme();
+
   const contextObj = useContext(context);
 
   const ownChildren = i18nDispatcher.getString(children) || children;

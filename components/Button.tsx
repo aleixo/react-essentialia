@@ -61,6 +61,7 @@ interface Props extends ButtonProps {
   borderRadius?: number;
   align?: string;
   padding?: number;
+  title?: string;
 }
 
 const Button = ({

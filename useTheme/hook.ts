@@ -5,12 +5,15 @@ import { IThemeState, IThemeContext } from "../types";
 
 import { Uuid } from "../helpers";
 
-interface IHookDispatcher {
-  toggleTheme(theme: string): void;
-  changeFontScale(fontScale: number): void;
-}
+type TDispatcher = ({
+  theme,
+  fontScale,
+}?: {
+  theme?: string;
+  fontScale?: number;
+}) => void;
 
-const useTheme = (): [IThemeState, IHookDispatcher] => {
+const useTheme = (): [IThemeState, TDispatcher] => {
   const contextValue = useContext<IThemeContext>(context);
   const [subscriptionId] = useState(Uuid());
   const [state, dispatch] = useState<IThemeState>(contextValue.state);
@@ -31,30 +34,19 @@ const useTheme = (): [IThemeState, IHookDispatcher] => {
     });
   };
 
-  const toggleTheme = (theme: string) => {
-    dispatchSubscribers({
-      theme,
-      color: contextValue.state.colors[theme],
-    });
-  };
-
-  const changeFontScale = (fontScale: number) => {
+  const dispatcher = ({ theme = "default", fontScale = 1 } = {}): void => {
     const scaledSizes = Object.keys(state.originalSizes).reduce((acc, key) => {
       return {
         ...acc,
         [key]: state.originalSizes[key] * fontScale,
       };
     }, {});
-
     dispatchSubscribers({
-      fontScale,
       sizes: scaledSizes,
+      color: contextValue.state.colors[theme],
+      fontScale,
+      theme,
     });
-  };
-
-  const dispatcher = {
-    toggleTheme,
-    changeFontScale,
   };
 
   return [state, dispatcher];

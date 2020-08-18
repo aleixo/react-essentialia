@@ -1,9 +1,12 @@
 export interface IColor {
   primary?: string;
   secondary?: string;
-  neutral?: string;
   background?: string;
   text?: string;
+  border?: string;
+  success?: string;
+  error?: string;
+  warn?: string;
 }
 export interface colors {
   default: IColor;

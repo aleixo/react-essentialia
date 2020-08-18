@@ -16,6 +16,7 @@ interface ProviderProps {
   // Themes
   colors?: types.colors;
   sizes?: types.sizes;
+  theme?: string;
   // I18n
   strings?: object;
   initialLang: string;
@@ -24,15 +25,16 @@ interface ProviderProps {
 const Provider = ({
   children,
   familyName,
-  initialLang,
-  colors = { default: {} },
-  sizes = {},
   styleExtensions = {},
-  strings = {},
+  colors,
+  sizes,
+  strings,
+  initialLang,
+  theme,
 }: ProviderProps) => {
   return (
     <I18nProvider lang={initialLang} strings={strings}>
-      <ThemeProvider colors={colors} sizes={sizes}>
+      <ThemeProvider colors={colors} sizes={sizes} theme={theme}>
         <ProviderContext
           value={{
             state: {
