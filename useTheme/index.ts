@@ -1,5 +1,5 @@
-import useTheme from "./hook";
+import useTheme from "./useTheme";
+import useDispatcher from "./useDispatcher";
 import { ThemeProvider } from "./context";
 
-export default useTheme;
-export { ThemeProvider };
+export { ThemeProvider, useDispatcher, useTheme };

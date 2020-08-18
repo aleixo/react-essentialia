@@ -3,8 +3,8 @@ import { Text as RNText, TextProps } from "react-native";
 
 import * as types from "../types";
 import context from "../context";
-import useI18n from "../useI18n";
-import useTheme from "../useTheme";
+import { useI18n } from "../useI18n";
+import { useTheme } from "../useTheme";
 
 interface Props extends TextProps {
   children: any;
@@ -53,7 +53,7 @@ const buildStyle = (
     label: "label",
     paragraph: "paragraph",
   };
-console.log(sizes)
+
   const componentDefault = {
     color: color.text,
     fontSize: sizes[sizeMapper[name]],

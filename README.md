@@ -1,5 +1,32 @@
 # Usage
 
+```
+<Provider
+        initialLang="PT"
+        colors={{
+          default: {
+            text: 'blue',
+          },
+          light: {
+            text: 'grey',
+          },
+        }}
+        strings={{
+          PT: {
+            MY_COMPONENT: {
+              CURR_LANGUAGE: 'PORTUGUESE',
+            },
+          },
+          EN: {
+            MY_COMPONENT: {
+              CURR_LANGUAGE: 'ENGLISH',
+            },
+          },
+        }}>
+        {children}
+      </Provider>
+```
+
 # Peer Dependencies
 
 - "react-native-render-html": "^4.2.2",

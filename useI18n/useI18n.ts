@@ -17,10 +17,8 @@ const useI18n = (): [stateType, hookDispatcher] => {
   const [state, dispatch] = useState<stateType>(contextValue.state);
 
   useEffect(() => {
+    console.log("SUBSCRIPTION");
     contextValue.subscribers[subscriptionId] = (newState: stateType) => {
-      if (JSON.stringify(state) === JSON.stringify(newState)) {
-        return;
-      }
       dispatch(newState);
     };
 
@@ -41,11 +39,15 @@ const useI18n = (): [stateType, hookDispatcher] => {
     });
   };
 
-  const getString = (path) => {
+  const getString = (path?: string) => {
     if (typeof path !== "string") {
       return path;
     }
-    return objects.byString(state.strings[state.lang], path);
+    return path.split(" ").reduce((acc, val) => {
+      return `${acc} ${
+        objects.byString(state.strings[state.lang], val) || val
+      }`;
+    }, "");
   };
 
   const dispatcher = {

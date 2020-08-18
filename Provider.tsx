@@ -1,7 +1,7 @@
 import React from "react";
 
 import context from "./context";
-import { objects } from "./helpers";
+
 import { I18nProvider } from "./useI18n";
 import { ThemeProvider } from "./useTheme";
 import * as types from "./types";
@@ -32,6 +32,7 @@ const Provider = ({
   styleExtensions = {},
   strings = {},
 }: ProviderProps) => {
+  console.log("OK OK ", sizes);
   return (
     <I18nProvider lang={initialLang} strings={strings}>
       <ThemeProvider colors={colors} sizes={sizes} theme={theme}>
