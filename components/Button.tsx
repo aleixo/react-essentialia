@@ -1,11 +1,9 @@
 import React, { useContext, useState } from "react";
 
 import {
-  View,
   TouchableOpacity,
   ButtonProps,
   ViewStyle,
-  ColorPropType,
   TextStyle,
 } from "react-native";
 
@@ -123,6 +121,7 @@ const Button = ({
   langToggle,
   fontScaleToggle,
   themeToggle,
+  // Configurations
   modifiers = "",
   ...props
 }: Props) => {
