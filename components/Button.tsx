@@ -93,6 +93,7 @@ const modifierStyle = (
 
 interface Props extends ButtonProps {
   onPress?: Function;
+  onToggle?(value: any): any;
   size?: number;
   width?: number;
   height?: number;
@@ -121,6 +122,7 @@ const Button = ({
   langToggle,
   fontScaleToggle,
   themeToggle,
+  onToggle,
   // Configurations
   modifiers = "",
   ...props
@@ -129,20 +131,24 @@ const Button = ({
     i18nIndex: number;
     fontScaleIndex: number;
     themeIndex: number;
+    toggled: any;
   }>({
     i18nIndex: 0,
     fontScaleIndex: 0,
     themeIndex: 0,
+    toggled: undefined,
   });
   const [, i18nDispatch] = useI18n();
   const [themeState, themeDispatch] = useTheme();
   const contextObj = useContext(context);
 
   const onTouchablePress = (evt: any) => {
+    console.log("onTouchablePress");
     if (Array.isArray(langToggle)) {
       i18nDispatch.setLanguage(langToggle[state.i18nIndex]);
       dispatch({
         ...state,
+        toggled: langToggle[state.i18nIndex],
         i18nIndex:
           state.i18nIndex + 1 >= langToggle.length ? 0 : state.i18nIndex + 1,
       });
@@ -156,6 +162,7 @@ const Button = ({
 
       dispatch({
         ...state,
+        toggled: fontScaleToggle[state.fontScaleIndex],
         fontScaleIndex:
           state.fontScaleIndex + 1 >= fontScaleToggle.length
             ? 0
@@ -171,6 +178,7 @@ const Button = ({
 
       dispatch({
         ...state,
+        toggled: themeToggle[state.themeIndex],
         themeIndex:
           state.themeIndex + 1 >= themeToggle.length ? 0 : state.themeIndex + 1,
       });
@@ -185,7 +193,7 @@ const Button = ({
     size,
     providerModifiers,
   });
-
+  console.log(state.toggled);
   return (
     <TouchableOpacity
       {...props}
@@ -201,14 +209,20 @@ const Button = ({
       }}
       onPress={onTouchablePress}
     >
-      <Text
-        label
-        style={{
-          ...modifier.text,
-        }}
-      >
-        {title}
-      </Text>
+      {(themeToggle || fontScaleToggle || langToggle) &&
+      onToggle &&
+      state.toggled ? (
+        onToggle(state.toggled)
+      ) : (
+        <Text
+          label
+          style={{
+            ...modifier.text,
+          }}
+        >
+          {title}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };

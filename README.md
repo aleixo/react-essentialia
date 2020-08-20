@@ -164,6 +164,18 @@ Use toggling theme in button. This will toggle between `light` and `default` the
 <Button themeToggle={['light', 'default']} title="Theme toggle AUTO" />
 ```
 
+Toggle language and render custom value on toggle
+
+```
+<Button
+          langToggle={['EN', 'PT']}
+          title="Change to english AUTO"
+          onToggle={(value) => {
+            return <Text>CUSTOM RENDER {value}</Text>;
+          }}
+        />
+```
+
 ### Forms
 
 Components that can be used inside a form
