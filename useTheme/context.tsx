@@ -28,7 +28,6 @@ export const ThemeProvider = ({
   theme = "default",
   sizes = {},
 }: IProvider) => {
-  console.log("PROviDER ", sizes);
   return (
     <Provider
       value={{

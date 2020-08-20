@@ -1,7 +1,7 @@
 export interface IColor {
   primary?: string;
   secondary?: string;
-  background?: string;
+  backgroundColor?: string;
   text?: string;
   border?: string;
   success?: string;
@@ -24,34 +24,19 @@ export interface sizes {
   label?: number;
 }
 
-type textStyleExtensions = {
+export type TAllowedModifiers = {
   color?: string;
-  borderWidth?: string;
 };
 
-export interface styleExtensions {
-  default?: {
-    color?: string;
-    borderWidth?: string;
-  };
-  h1?: textStyleExtensions;
-  h2?: textStyleExtensions;
-  h3?: textStyleExtensions;
-  h4?: textStyleExtensions;
-  h5?: textStyleExtensions;
-  h6?: textStyleExtensions;
-  paragraph?: textStyleExtensions;
-  label?: textStyleExtensions;
-  button?: {
-    color?: string;
-    paddingHorizontal?: number;
-    paddingVertical?: number;
-  };
-}
+export type TModifiers = (
+  currentColor: IColor
+) => {
+  [key: string]: TAllowedModifiers;
+};
 
 export interface state {
   familyName?: string;
-  styleExtensions?: styleExtensions;
+  modifiers?: TModifiers;
 }
 
 export interface context {

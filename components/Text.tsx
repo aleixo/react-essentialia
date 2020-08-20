@@ -97,7 +97,6 @@ export default ({
       {...props}
       style={{
         ...styles,
-        ...contextObj.state.styleExtensions?.[size],
         ...props.style,
       }}
     >

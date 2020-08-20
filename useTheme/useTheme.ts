@@ -35,7 +35,6 @@ const useTheme = (): [IThemeState, TDispatcher] => {
   };
 
   const dispatcher = ({ theme = "default", fontScale = 1 } = {}) => {
-    console.log(contextValue);
     const scaledSizes = Object.keys(state.originalSizes).reduce((acc, key) => {
       return {
         ...acc,

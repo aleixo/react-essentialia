@@ -17,7 +17,6 @@ const useI18n = (): [stateType, hookDispatcher] => {
   const [state, dispatch] = useState<stateType>(contextValue.state);
 
   useEffect(() => {
-    console.log("SUBSCRIPTION");
     contextValue.subscribers[subscriptionId] = (newState: stateType) => {
       dispatch(newState);
     };

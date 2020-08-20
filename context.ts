@@ -4,7 +4,7 @@ import * as types from "./types";
 
 const initialState = {
   familyName: "",
-  styleExtensions: {},
+  modifiers: () => {},
 };
 
 export default React.createContext<types.context>({

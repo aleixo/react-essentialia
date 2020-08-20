@@ -11,7 +11,7 @@ const ProviderContext = context.Provider;
 interface ProviderProps {
   children: any;
   // UI
-  styleExtensions?: types.styleExtensions;
+  modifiers?: types.TModifiers;
   familyName?: string;
   // Themes
   colors?: types.colors;
@@ -29,10 +29,9 @@ const Provider = ({
   theme,
   initialLang = "",
   sizes = defaultSizes,
-  styleExtensions = {},
   strings = {},
+  modifiers,
 }: ProviderProps) => {
-  console.log("OK OK ", sizes);
   return (
     <I18nProvider lang={initialLang} strings={strings}>
       <ThemeProvider colors={colors} sizes={sizes} theme={theme}>
@@ -40,7 +39,7 @@ const Provider = ({
           value={{
             state: {
               familyName,
-              styleExtensions,
+              modifiers,
             },
             subscribers: {},
           }}

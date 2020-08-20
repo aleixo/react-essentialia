@@ -83,7 +83,6 @@ const View = ({
       margins: marginsStyle,
       shadow: shadow || shadowRadius ? shadowStyle : {},
       round: round ? roundStyle : {},
-      extensions: contextValue.state.styleExtensions.view,
       customStyle: style,
     };
 

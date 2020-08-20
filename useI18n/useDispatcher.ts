@@ -14,9 +14,7 @@ const useDispatcher = (): IDIspatcher => {
   const contextValue = useContext<contextType>(context);
 
   const dispatchSubscribers = (newState) => {
-    console.log("DISPATCH", contextValue.subscribers);
     Object.keys(contextValue.subscribers).forEach((key: string) => {
-      console.log("DISPATCH");
       contextValue.subscribers[key]({ ...contextValue.state, ...newState });
     });
   };
