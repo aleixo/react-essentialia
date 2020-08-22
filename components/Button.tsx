@@ -104,7 +104,7 @@ interface Props extends ButtonProps {
   langToggle?: string[];
   fontScaleToggle?: number[];
   themeToggle?: string[];
-  modifiers?: string;
+  modifiers?: "round" | "bordered" | string;
 }
 
 const Button = ({
@@ -143,7 +143,6 @@ const Button = ({
   const contextObj = useContext(context);
 
   const onTouchablePress = (evt: any) => {
-    console.log("onTouchablePress");
     if (Array.isArray(langToggle)) {
       i18nDispatch.setLanguage(langToggle[state.i18nIndex]);
       dispatch({
@@ -186,14 +185,17 @@ const Button = ({
     onPress && onPress(evt);
   };
 
-  const providerModifiers = contextObj.state.modifiers(themeState.color);
+  const providerModifiers =
+    (contextObj.state.modifiers &&
+      contextObj.state.modifiers(themeState.color)) ||
+    {};
 
   const modifier = modifierStyle(modifiers, {
     color: themeState.color,
     size,
     providerModifiers,
   });
-  console.log(state.toggled);
+
   return (
     <TouchableOpacity
       {...props}

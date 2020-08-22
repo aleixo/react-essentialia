@@ -85,7 +85,6 @@ export default ({
   const [themeState] = useTheme();
 
   const contextObj = useContext(context);
-
   const ownChildren = i18nDispatcher.getString(children) || children;
 
   const sizesObject = { h1, h2, h3, h4, h5, h6, paragraph, label };
@@ -96,6 +95,7 @@ export default ({
     <RNText
       {...props}
       style={{
+        fontFamily: contextObj.state.fontFamily,
         ...styles,
         ...props.style,
       }}

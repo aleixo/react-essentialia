@@ -86,7 +86,14 @@ class TopBar extends React.Component<ITopBar> {
     const hasEnabled =
       this.props.enable && this.props.enable !== prevProps.enable;
 
+    const shouldFadeIn = this.props.open && this.props.open !== prevProps.open;
+    const shouldFadeOut =
+      !this.props.open && this.props.open !== prevProps.open;
+
     hasEnabled && this.runAnimations();
+
+    shouldFadeIn && this.fadeIn();
+    shouldFadeOut && this.fadeOut(this.props.fadeoutDuration);
   }
 
   runAnimations = () => {
@@ -122,16 +129,10 @@ class TopBar extends React.Component<ITopBar> {
     };
 
     willFadeOut();
-    setTimeout(
-      () =>
-        Animated.timing(this.state.fadeAnim, toolbarFadeoutAnimation).start(
-          () => {
-            onFadeOut();
-            this.isOpened = false;
-          }
-        ),
-      fadeoutAfter
-    );
+    Animated.timing(this.state.fadeAnim, toolbarFadeoutAnimation).start(() => {
+      onFadeOut();
+      this.isOpened = false;
+    });
   };
 
   render() {

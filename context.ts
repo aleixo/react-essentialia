@@ -3,7 +3,7 @@ import React from "react";
 import * as types from "./types";
 
 const initialState = {
-  familyName: "",
+  fontFamily: "",
   modifiers: () => {},
 };
 

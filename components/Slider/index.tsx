@@ -13,7 +13,7 @@ interface ISlider {
   autoplay?: boolean;
   defaultPaginationInactiveColor?: string;
   defaultPaginationActiveColor?: string;
-  renderCustomPagination(index: number): void;
+  renderCustomPagination?(index: number): void;
 }
 
 class Slider extends React.Component<ISlider> {

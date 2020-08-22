@@ -12,7 +12,7 @@ interface ProviderProps {
   children: any;
   // UI
   modifiers?: types.TModifiers;
-  familyName?: string;
+  fontFamily?: string;
   // Themes
   colors?: types.colors;
   sizes?: types.sizes;
@@ -24,7 +24,7 @@ interface ProviderProps {
 
 const Provider = ({
   children,
-  familyName,
+  fontFamily,
   colors = { default: {} },
   theme,
   initialLang = "",
@@ -38,7 +38,7 @@ const Provider = ({
         <ProviderContext
           value={{
             state: {
-              familyName,
+              fontFamily,
               modifiers,
             },
             subscribers: {},

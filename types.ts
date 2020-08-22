@@ -35,7 +35,7 @@ export type TModifiers = (
 };
 
 export interface state {
-  familyName?: string;
+  fontFamily?: string;
   modifiers?: TModifiers;
 }
 
