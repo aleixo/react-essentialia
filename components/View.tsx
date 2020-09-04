@@ -3,6 +3,7 @@ import { View as RNView, StyleSheet, ViewProps, ViewStyle } from "react-native";
 
 import context from "../context";
 import { Uuid } from "../helpers";
+import { useTheme } from "../..";
 
 interface Props extends ViewProps {
   shadow?: Boolean;
@@ -17,7 +18,10 @@ interface Props extends ViewProps {
   mb?: number;
   p?: number;
   m?: number;
+  ml?: number;
+  mr?: number;
   style?: ViewStyle;
+  screen?: boolean;
 }
 
 // TODO - Put styles in context and if the style already exists,
@@ -35,11 +39,13 @@ const View = ({
   mb = 0,
   p = 0,
   m = 0,
+  ml = 0,
+  mr = 0,
   style,
+  screen,
   ...props
 }: Props) => {
-  const contextValue = useContext(context);
-  const [name] = useState("view_" + Uuid());
+  const [themeState] = useTheme();
 
   const DEFAULT_SHADOW_RADIUS = 2.62;
   const roundStyle = {
@@ -63,10 +69,11 @@ const View = ({
   };
 
   const structureStyle = {
+    backgroundColor: screen ? themeState.color.screenBackground : "transparent",
     display: "flex",
     flexDirection: row ? "row" : "column",
-    justifyContent: xAlign,
-    alignItems: yAlign,
+    justifyContent: row ? xAlign : yAlign,
+    alignItems: row ? yAlign : xAlign,
     flex: flexWeight,
   };
 
@@ -74,6 +81,8 @@ const View = ({
     marginBottom: mb,
     padding: p,
     margin: m,
+    marginRight: mr,
+    marginLeft: ml,
   };
 
   const createStylesheet = () => {

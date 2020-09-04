@@ -4,49 +4,50 @@
 
 Configure the lib at app entry. The lib after configured will provide to you the theme, i18n and all the styles needed.
 
-```
+```js
 <Provider
-        initialLang="PT"
-        sizes={{
-          XL: 30,
-          L: 26,
-          M: 22,
-          S: 20,
-          XS: 18,
-          XXS: 16,
-          label: 14,
-          paragraph: 12,
-        }}
-        colors={{
-          default: {
-            text: 'blue',
-            border: 'red',
-            backgroundColor: 'yellow',
-          },
-          light: {
-            text: 'grey',
-            border: 'blue',
-          },
-        }}
-        modifiers={(currentColor) => ({
-          button_red: {
-            color: 'red',
-          },
-        })}
-        strings={{
-          PT: {
-            MY_COMPONENT: {
-              CURR_LANGUAGE: 'PORTUGUESE',
-            },
-          },
-          EN: {
-            MY_COMPONENT: {
-              CURR_LANGUAGE: 'ENGLISH',
-            },
-          },
-        }}>
-        {children}
-      </Provider>
+  initialLang="PT"
+  sizes={{
+    XL: 30,
+    L: 26,
+    M: 22,
+    S: 20,
+    XS: 18,
+    XXS: 16,
+    label: 14,
+    paragraph: 12,
+  }}
+  colors={{
+    default: {
+      text: "blue",
+      border: "red",
+      backgroundColor: "yellow",
+    },
+    light: {
+      text: "grey",
+      border: "blue",
+    },
+  }}
+  modifiers={(currentColor) => ({
+    button_red: {
+      color: "red",
+    },
+  })}
+  strings={{
+    PT: {
+      MY_COMPONENT: {
+        CURR_LANGUAGE: "PORTUGUESE",
+      },
+    },
+    EN: {
+      MY_COMPONENT: {
+        CURR_LANGUAGE: "ENGLISH",
+      },
+    },
+  }}
+>
+  {children}
+</Provider>
 ```
 
 ## Usage
@@ -59,7 +60,7 @@ The lib provide one hook to:
 - Change font theme
 - Change language
 
-```
+```js
 import {  useDispatcher  } from 'react-native-essentialia';
 
 ...
@@ -85,17 +86,17 @@ Also, all those functionalities are available on `<Button />` as props.
 
 View with default shadow
 
-```
+```js
 <View m={20} p={20} shadow>
-        <Text h1>TEXT</Text>
-      </View>
+  <Text h1>TEXT</Text>
+</View>
 ```
 
 ### Text
 
 The text will read the provided configurations on the Provider by the sizes object
 
-```
+```js
 <Text h1>H1</Text>
 <Text h3>H2</Text>
 <Text h3>H3</Text>
@@ -108,7 +109,7 @@ The text will read the provided configurations on the Provider by the sizes obje
 
 Also the text will react to i18n if you give the corresponding string
 
-```
+```js
 <Text h5>MY_COMPONENT.CURR_LANGUAGE</Text>
 ```
 
@@ -118,7 +119,7 @@ if not will return the raw children
 The following example will display "Paragraph PORTUGUESE" assuming the configuration in the top of
 the example
 
-```
+```js
 <Text paragraph>Paragraph MY_COMPONENT.CURR_LANGUAGE</Text>
 ```
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
   View,
   StatusBar,
@@ -15,173 +15,144 @@ interface ITopBar {
   backgroundColor: string;
   toHeight: number;
   fadeinDuration: number;
-  native?: boolean;
   enable?: boolean;
   fadeoutAfter?: number;
   fadeoutDuration?: number;
   fadeout?: boolean;
 }
 
-class TopBar extends React.Component<ITopBar> {
-  constructor(props: ITopBar) {
-    super(props);
+const TopBar = ({
+  image,
+  backgroundColor,
+  toHeight,
+  fadeinDuration,
+  enable,
+  fadeoutAfter,
+  fadeoutDuration,
+  fadeout,
+  willFadeOut,
+  willFadeIn,
+  onFadeOut,
+  onFadeIn,
+  toWidth,
+  open,
+  renderContent,
+  swipable,
+  opacity,
+}: ITopBar) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [state, dispatch] = useState({
+    toolbarFadeInAnimation: {
+      toValue: toHeight,
+      duration: fadeinDuration,
+      useNativeDriver: false,
+    },
+    toolbarFadeOutAnimation: {
+      toValue: 0,
+      duration: fadeoutDuration,
+      useNativeDriver: false,
+    },
+  });
 
-    this.state = {
-      fadeAnim: new Animated.Value(0),
-    };
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (evt, gestureState) => true,
+        onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+        onPanResponderMove: (evt, gestureState) => {
+          if (gestureState.moveY < toHeight) {
+            Animated.timing(fadeAnim, {
+              toValue: gestureState.moveY,
+              duration: 0,
+            }).start();
+          }
+        },
+        onPanResponderRelease: (evt, gestureState) => {
+          const toValue = gestureState.moveY < toHeight / 2 ? 0 : toHeight;
+          const closing = toValue === 0;
 
-    this.toolbarAnimation = {
-      toValue: props.toHeight,
-      duration: props.fadeinDuration,
-    };
+          closing ? willFadeOut() : willFadeIn();
 
-    this._panResponder = PanResponder.create({
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onPanResponderMove: (evt, gestureState) => {
-        const { toHeight } = this.props;
+          Animated.timing(fadeAnim, {
+            toValue,
+            duration: 200,
+          }).start(() => {
+            closing ? onFadeOut() : onFadeIn();
+          });
+        },
+      }),
+    []
+  );
 
-        if (gestureState.moveY < toHeight) {
-          Animated.timing(this.state.fadeAnim, {
-            toValue: gestureState.moveY,
-            duration: 0,
-          }).start();
-        }
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        const { swipeDuration } = this.props;
-        const {
-          toHeight,
-          onFadeIn,
-          onFadeOut,
-          willFadeOut,
-          willFadeIn,
-        } = this.props;
-        const toValue = gestureState.moveY < toHeight / 2 ? 0 : toHeight;
-        const closing = toValue === 0;
-
-        closing ? willFadeOut() : willFadeIn();
-
-        Animated.timing(this.state.fadeAnim, {
-          toValue,
-          duration: 200,
-        }).start(() => {
-          this.isOpened = !closing;
-          closing ? onFadeOut() : onFadeIn();
-        });
-      },
-    });
-  }
-
-  componentDidMount() {
-    const { enable } = this.props;
+  useEffect(() => {
     if (!enable) {
       return;
     }
 
-    this.runAnimations();
-  }
+    runAnimations();
+  }, []);
 
-  componentDidUpdate(prevProps) {
-    const hasEnabled =
-      this.props.enable && this.props.enable !== prevProps.enable;
-
-    const shouldFadeIn = this.props.open && this.props.open !== prevProps.open;
-    const shouldFadeOut =
-      !this.props.open && this.props.open !== prevProps.open;
-
-    hasEnabled && this.runAnimations();
-
-    shouldFadeIn && this.fadeIn();
-    shouldFadeOut && this.fadeOut(this.props.fadeoutDuration);
-  }
-
-  runAnimations = () => {
-    const { fadeout, fadeoutDuration } = this.props;
-
-    this.fadeIn(() => {
-      fadeout && this.fadeOut(fadeoutDuration);
+  const runAnimations = () => {
+    fadeIn(() => {
+      fadeout && fadeOut(fadeoutDuration);
     });
   };
-
-  fadeIn = (next) => {
-    if (this.isOpened) {
-      return;
-    }
-    const { willFadeIn, onFadeIn } = this.props;
+  const fadeIn = (next?: any) => {
     willFadeIn();
-    Animated.timing(this.state.fadeAnim, this.toolbarAnimation).start(() => {
-      this.isOpened = true;
+    Animated.timing(fadeAnim, state.toolbarFadeInAnimation).start(() => {
       next && next();
       onFadeIn();
     });
   };
 
-  fadeOut = (duration) => {
-    if (!this.isOpened) {
-      return;
-    }
-
-    const { fadeoutAfter, onFadeOut, willFadeOut, toHeight } = this.props;
-    const toolbarFadeoutAnimation = {
-      toValue: 0,
-      duration,
-    };
-
+  const fadeOut = (duration?: number) => {
     willFadeOut();
-    Animated.timing(this.state.fadeAnim, toolbarFadeoutAnimation).start(() => {
+    Animated.timing(fadeAnim, state.toolbarFadeOutAnimation).start(() => {
       onFadeOut();
-      this.isOpened = false;
     });
   };
 
-  render() {
-    const { fadeAnim } = this.state;
-    const {
-      image,
-      renderContent,
-      backgroundColor,
-      opacity,
-      toWidth,
-    } = this.props;
-    return (
-      <View style={[styles.mainContainer, { top: 0 }]}>
-        <Animated.View
-          style={[
-            styles.topLogoContainer,
-            {
-              width: Dimensions.get("window").width / (toWidth || 1.5),
-              height: fadeAnim,
-              backgroundColor,
-              opacity,
-            },
-          ]}
-          {...(this.props.swipable && this._panResponder.panHandlers)}
-        >
-          {renderContent && renderContent()}
-          {image && (
-            <SafeAreaView
+  useEffect(() => {
+    open ? fadeIn() : fadeOut(fadeoutDuration);
+  }, [open]);
+
+  return (
+    <View style={[styles.mainContainer, { top: 0 }]}>
+      <Animated.View
+        style={[
+          styles.topLogoContainer,
+          {
+            width: Dimensions.get("window").width / (toWidth || 1.5),
+            height: fadeAnim,
+            backgroundColor,
+            opacity,
+          },
+        ]}
+        {...(swipable && panResponder.panHandlers)}
+      >
+        {renderContent && renderContent()}
+        {image && (
+          <SafeAreaView
+            style={{
+              paddingTop: StatusBar.currentHeight,
+              marginBottom: 10,
+            }}
+          >
+            <Animated.Image
+              resizeMode="contain"
+              source={image}
               style={{
-                paddingTop: StatusBar.currentHeight,
-                marginBottom: 10,
+                flex: 1,
+                width: Dimensions.get("window").width / 1.5,
+                height: fadeAnim,
               }}
-            >
-              <Animated.Image
-                resizeMode="contain"
-                source={image}
-                style={{
-                  flex: 1,
-                  width: Dimensions.get("window").width / 1.5,
-                  height: fadeAnim,
-                }}
-              />
-            </SafeAreaView>
-          )}
-        </Animated.View>
-      </View>
-    );
-  }
-}
+            />
+          </SafeAreaView>
+        )}
+      </Animated.View>
+    </View>
+  );
+};
 
 TopBar.defaultProps = {
   enable: true,

@@ -215,6 +215,8 @@ const Button = ({
       onToggle &&
       state.toggled ? (
         onToggle(state.toggled)
+      ) : children ? (
+        children
       ) : (
         <Text
           label

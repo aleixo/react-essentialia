@@ -2,6 +2,7 @@ export interface IColor {
   primary?: string;
   secondary?: string;
   backgroundColor?: string;
+  screenBackground?: string;
   text?: string;
   border?: string;
   success?: string;
