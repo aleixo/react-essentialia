@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import {
   View,
   StatusBar,
@@ -19,42 +19,43 @@ interface ITopBar {
   fadeoutAfter?: number;
   fadeoutDuration?: number;
   fadeout?: boolean;
+  open?: boolean;
+  swipable?: boolean;
+  onFadeIn(): void;
+  onFadeOut(): void;
+  willFadeOut(): void;
+  willFadeIn(): void;
+  toWidth?: number;
+  renderContent(): any;
+  opacity?: number;
 }
 
 const TopBar = ({
-  image,
-  backgroundColor,
-  toHeight,
   fadeinDuration,
-  enable,
-  fadeoutAfter,
+  open,
   fadeoutDuration,
+  swipable,
+  toHeight,
   fadeout,
+  toWidth,
+  backgroundColor,
+  opacity,
+  image,
+  onFadeIn,
+  onFadeOut,
   willFadeOut,
   willFadeIn,
-  onFadeOut,
-  onFadeIn,
-  toWidth,
-  open,
   renderContent,
-  swipable,
-  opacity,
 }: ITopBar) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const [state, dispatch] = useState({
-    toolbarFadeInAnimation: {
-      toValue: toHeight,
-      duration: fadeinDuration,
-      useNativeDriver: false,
-    },
-    toolbarFadeOutAnimation: {
-      toValue: 0,
-      duration: fadeoutDuration,
-      useNativeDriver: false,
-    },
-  });
+  const toolbarAnimation = {
+    toValue: toHeight,
+    duration: fadeinDuration,
+    useNativeDriver: false,
+  };
 
-  const panResponder = useMemo(
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const _panResponder = useMemo(
     () =>
       PanResponder.create({
         onMoveShouldSetPanResponder: (evt, gestureState) => true,
@@ -64,6 +65,7 @@ const TopBar = ({
             Animated.timing(fadeAnim, {
               toValue: gestureState.moveY,
               duration: 0,
+              useNativeDriver: false,
             }).start();
           }
         },
@@ -76,6 +78,7 @@ const TopBar = ({
           Animated.timing(fadeAnim, {
             toValue,
             duration: 200,
+            useNativeDriver: false,
           }).start(() => {
             closing ? onFadeOut() : onFadeIn();
           });
@@ -85,10 +88,6 @@ const TopBar = ({
   );
 
   useEffect(() => {
-    if (!enable) {
-      return;
-    }
-
     runAnimations();
   }, []);
 
@@ -97,23 +96,29 @@ const TopBar = ({
       fadeout && fadeOut(fadeoutDuration);
     });
   };
+
   const fadeIn = (next?: any) => {
     willFadeIn();
-    Animated.timing(fadeAnim, state.toolbarFadeInAnimation).start(() => {
+    Animated.timing(fadeAnim, toolbarAnimation).start(() => {
       next && next();
       onFadeIn();
     });
   };
 
-  const fadeOut = (duration?: number) => {
+  const fadeOut = (duration = 0) => {
+    const toolbarFadeoutAnimation = {
+      toValue: 0,
+      duration,
+      useNativeDriver: false,
+    };
+
     willFadeOut();
-    Animated.timing(fadeAnim, state.toolbarFadeOutAnimation).start(() => {
-      onFadeOut();
-    });
+    Animated.timing(fadeAnim, toolbarFadeoutAnimation).start(onFadeOut);
   };
 
   useEffect(() => {
-    open ? fadeIn() : fadeOut(fadeoutDuration);
+    open && fadeIn();
+    open || fadeOut(fadeoutDuration);
   }, [open]);
 
   return (
@@ -128,7 +133,7 @@ const TopBar = ({
             opacity,
           },
         ]}
-        {...(swipable && panResponder.panHandlers)}
+        {...(swipable && _panResponder.panHandlers)}
       >
         {renderContent && renderContent()}
         {image && (
@@ -156,11 +161,11 @@ const TopBar = ({
 
 TopBar.defaultProps = {
   enable: true,
-  swipeDuration: 300,
   willFadeOut: () => {},
   willFadeIn: () => {},
   onFadeIn: () => {},
   onFadeOut: () => {},
+  fadeoutDuration: 0,
 };
 
 export default TopBar;

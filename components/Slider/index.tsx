@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import { View, FlatList } from "react-native";
 
@@ -14,29 +14,39 @@ interface ISlider {
   defaultPaginationInactiveColor?: string;
   defaultPaginationActiveColor?: string;
   renderCustomPagination?(index: number): void;
+  onIndexChange(): void;
 }
+let autoPlayIntervalRef: any = null;
+let scrollStartAt: any;
 
-class Slider extends React.Component<ISlider> {
-  constructor(props: ISlider) {
-    super(props);
+const Slider = ({
+  autoplay,
+  autoplayInterval,
+  loop,
+  datasource,
+  onRender,
+  onIndexChange,
+  renderCustomPagination,
+  overridePagination,
+  defaultPaginationInactiveColor,
+  defaultPaginationActiveColor,
+  height,
+}: ISlider) => {
+  let listRef = useRef();
+  const [state, dispatch] = useState({
+    currentIndex: 0,
+    layout: { width: 0 },
+    listKey: `${Math.random()}`,
+  });
+  useEffect(() => {
+    autoplay && _startAutoplay(autoplayInterval);
 
-    this.currentIndex = 0;
+    return () => clearInterval(autoPlayIntervalRef);
+  }, []);
 
-    this.state = {
-      currentIndex: 0,
-      layout: {},
-      listKey: `${Math.random()}`,
-    };
-  }
-
-  /**
-   * This function acts on the will unmount life-cycle
-   *
-   * When unmounting we must clear the autoplay interval.
-   */
-  componentWillUnmount() {
-    clearInterval(this.autoPlayIntervalRef);
-  }
+  useEffect(() => {
+    onIndexChange();
+  }, [state.currentIndex]);
 
   /**
    * This function starts the autoplay, if the autoplay prop is true.
@@ -45,36 +55,19 @@ class Slider extends React.Component<ISlider> {
    *
    * @param {number }interval - The inteval in milliseconds
    */
-  _startAutoplay = (interval) => {
-    const { onIndexChange } = this.props;
+  const _startAutoplay = (interval) => {
     const autoplayHandler = () => {
-      this.currentIndex = this._nextIndexLeft();
-      this._updateIndexState(this.currentIndex, onIndexChange);
-      this.listRef &&
-        this.listRef.scrollToIndex({
+      state.currentIndex = _nextIndexLeft();
+      _updateIndexState(state.currentIndex, onIndexChange);
+      listRef &&
+        listRef.current.scrollToIndex({
           animated: true,
-          index: this.currentIndex,
+          index: state.currentIndex,
         });
     };
 
-    clearInterval(this.autoPlayIntervalRef);
-    this.autoPlayIntervalRef = setInterval(autoplayHandler, interval);
-  };
-
-  /**
-   * This function is called when the FlatList is mounted.
-   *
-   * The given reference will be stored on this.listRef and if
-   * autoplay from props is true, the _startAutoplay will be called.
-   *
-   * @param {Object} ref - The FlatList internal reference.
-   */
-  _handleFLatListMount = (ref) => {
-    const { autoplay, autoplayInterval } = this.props;
-
-    this.listRef = ref;
-
-    autoplay && this._startAutoplay(autoplayInterval);
+    clearInterval(autoPlayIntervalRef);
+    autoPlayIntervalRef = setInterval(autoplayHandler, interval);
   };
 
   /**
@@ -83,12 +76,11 @@ class Slider extends React.Component<ISlider> {
    *
    * @returns {number} - The next index number
    */
-  _nextIndexRight = () => {
-    const { loop, datasource } = this.props;
-    const nextObviousIndex = this.currentIndex - 1;
+  const _nextIndexRight = () => {
+    const nextObviousIndex = state.currentIndex - 1;
 
     if (!loop && nextObviousIndex < 0) {
-      return this.currentIndex;
+      return state.currentIndex;
     }
     return nextObviousIndex < 0 ? datasource.length - 1 : nextObviousIndex;
   };
@@ -99,12 +91,11 @@ class Slider extends React.Component<ISlider> {
    *
    * @returns {number} - The next index number
    */
-  _nextIndexLeft = () => {
-    const { loop, datasource } = this.props;
-    const nextObviousIndex = this.currentIndex + 1;
+  const _nextIndexLeft = () => {
+    const nextObviousIndex = state.currentIndex + 1;
 
     if (!loop && nextObviousIndex > datasource.length - 1) {
-      return this.currentIndex;
+      return state.currentIndex;
     }
     return nextObviousIndex > datasource.length - 1 ? 0 : nextObviousIndex;
   };
@@ -116,8 +107,8 @@ class Slider extends React.Component<ISlider> {
    *
    * @param {Object} item - THe component to be mounted.
    */
-  _handleFlatListRenderItem = ({ item }) => {
-    return <View style={styles.fullWidth}>{this.props.onRender(item)}</View>;
+  const _handleFlatListRenderItem = ({ item }) => {
+    return <View style={styles.fullWidth}>{onRender(item)}</View>;
   };
 
   /**
@@ -128,14 +119,12 @@ class Slider extends React.Component<ISlider> {
    *
    * @param {Object} event - The begin touch event.
    */
-  _handleTouchStart = () => {
-    clearInterval(this.autoPlayIntervalRef);
+  const _handleTouchStart = () => {
+    clearInterval(autoPlayIntervalRef);
   };
 
-  _handleTouchCancel = () => {
-    const { autoplay, autoplayInterval } = this.props;
-
-    autoplay && this._startAutoplay(autoplayInterval);
+  const _handleTouchCancel = () => {
+    autoplay && _startAutoplay(autoplayInterval);
   };
   /**
    * This function handles the ending of the touch.
@@ -144,10 +133,8 @@ class Slider extends React.Component<ISlider> {
    *
    * @param {Object} event - The end touch event.
    */
-  _handleTouchEnd = () => {
-    const { autoplay, autoplayInterval } = this.props;
-
-    autoplay && this._startAutoplay(autoplayInterval);
+  const _handleTouchEnd = () => {
+    autoplay && _startAutoplay(autoplayInterval);
   };
 
   /**
@@ -157,9 +144,9 @@ class Slider extends React.Component<ISlider> {
    *
    * @param {Object} event - The begin scroll event.
    */
-  _handleScrollBegin = (event) => {
-    this.scrollStartAt = event.nativeEvent.contentOffset.x;
-    clearInterval(this.autoPlayIntervalRef);
+  const _handleScrollBegin = (event) => {
+    scrollStartAt = event.nativeEvent.contentOffset.x;
+    clearInterval(autoPlayIntervalRef);
   };
 
   /**
@@ -173,22 +160,21 @@ class Slider extends React.Component<ISlider> {
    *
    * @param {Object} event - The end scroll event.
    */
-  _handleScrollEnd = (event) => {
-    const { autoplay, autoplayInterval, onIndexChange } = this.props;
+  const _handleScrollEnd = (event) => {
+    let scrollingLeft = event.nativeEvent.contentOffset.x > scrollStartAt;
 
-    let scrollingLeft = event.nativeEvent.contentOffset.x > this.scrollStartAt;
-
-    if (event.nativeEvent.contentOffset.x === this.scrollStartAt) {
-      scrollingLeft = this.currentIndex === 0 ? false : true;
+    if (event.nativeEvent.contentOffset.x === scrollStartAt) {
+      scrollingLeft = state.currentIndex === 0 ? false : true;
     }
 
-    this.currentIndex = scrollingLeft
-      ? this._nextIndexLeft()
-      : this._nextIndexRight();
-    this.listRef.scrollToIndex({ animated: true, index: this.currentIndex });
-    autoplay && this._startAutoplay(autoplayInterval);
+    state.currentIndex = scrollingLeft ? _nextIndexLeft() : _nextIndexRight();
+    listRef.current.scrollToIndex({
+      animated: true,
+      index: state.currentIndex,
+    });
+    autoplay && _startAutoplay(autoplayInterval);
 
-    this._updateIndexState(this.currentIndex, onIndexChange);
+    _updateIndexState(state.currentIndex, onIndexChange);
   };
 
   /**
@@ -200,8 +186,8 @@ class Slider extends React.Component<ISlider> {
    * @param {number} newIndex - The new index to the state.
    * @param {function} onIndexChange - The callback to when the state has changed.
    */
-  _updateIndexState = (newIndex, onIndexChange) => {
-    this.setState({ currentIndex: newIndex }, onIndexChange);
+  const _updateIndexState = (newIndex, onIndexChange) => {
+    dispatch({ ...state, currentIndex: newIndex });
   };
 
   /**
@@ -209,80 +195,68 @@ class Slider extends React.Component<ISlider> {
    *
    * @param {Object} event - The event containing the new layout info as nativeEvent.layout.
    */
-  _onViewLayout = (event) => {
-    this.setState({
-      layout: event.nativeEvent.layout,
-    });
+  const _onViewLayout = (event) => {
+    dispatch({ ...state, layout: event.nativeEvent.layout });
   };
 
-  render() {
-    const { currentIndex, layout, listKey } = this.state;
-    const {
-      renderCustomPagination,
-      overridePagination,
-      defaultPaginationInactiveColor,
-      defaultPaginationActiveColor,
-      height,
-      datasource,
-    } = this.props;
-    return (
-      <View
-        style={{
-          flex: height ? 0 : 1,
-          height: height,
-        }}
-        onLayout={this._onViewLayout}
-      >
-        <FlatList
-          horizontal
-          listKey={listKey}
-          keyExtractor={() => `${Math.random()}`}
-          ref={this._handleFLatListMount}
-          data={datasource}
-          renderItem={this._handleFlatListRenderItem}
-          showsHorizontalScrollIndicator={false}
-          onTouchStart={this._handleTouchStart}
-          onTouchEnd={this._handleTouchEnd}
-          onScrollBeginDrag={this._handleScrollBegin}
-          onScrollEndDrag={this._handleScrollEnd}
-          onTouchCancel={this._handleTouchCancel}
-          onTouchEndCapture={this._handleTouchCancel}
-        />
-        <View
-          onTouchStart={this._handleTouchStart}
-          onTouchEnd={this._handleTouchEnd}
-          style={[styles.paginationContainer, { width: layout.width }]}
-        >
-          {renderCustomPagination && (
-            <View
-              style={{ position: "absolute", bottom: 0, width: layout.width }}
-            >
-              {renderCustomPagination(currentIndex)}
-            </View>
-          )}
-          {overridePagination || (
-            <View style={styles.defaultPaginationContainer}>
-              {datasource.map((data, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.defaultPaginationItem,
-                    {
-                      backgroundColor:
-                        currentIndex === index
-                          ? defaultPaginationActiveColor
-                          : defaultPaginationInactiveColor,
-                    },
-                  ]}
-                />
-              ))}
-            </View>
-          )}
-        </View>
+  return (
+    <View
+      style={{
+        flex: height ? 0 : 1,
+        height: height,
+      }}
+      onLayout={_onViewLayout}
+    >
+      <FlatList
+        horizontal
+        listKey={state.listKey}
+        keyExtractor={() => `${Math.random()}`}
+        ref={listRef}
+        data={datasource}
+        renderItem={_handleFlatListRenderItem}
+        showsHorizontalScrollIndicator={false}
+        onTouchStart={_handleTouchStart}
+        onTouchEnd={_handleTouchEnd}
+        onScrollBeginDrag={_handleScrollBegin}
+        onScrollEndDrag={_handleScrollEnd}
+        onTouchCancel={_handleTouchCancel}
+        onTouchEndCapture={_handleTouchCancel}
+        pagingEnabled
+      />
+      <View onTouchStart={_handleTouchStart} onTouchEnd={_handleTouchEnd}>
+        {renderCustomPagination && (
+          <View
+            style={{
+              position: "absolute",
+              bottom: 0,
+              width: state.layout.width,
+            }}
+          >
+            {renderCustomPagination(state.currentIndex)}
+          </View>
+        )}
+        {overridePagination || (
+          <View style={styles.defaultPaginationContainer}>
+            {datasource.map((data, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.defaultPaginationItem,
+                  {
+                    backgroundColor:
+                      state.currentIndex === index
+                        ? defaultPaginationActiveColor
+                        : defaultPaginationInactiveColor,
+                  },
+                ]}
+              />
+            ))}
+          </View>
+        )}
       </View>
-    );
-  }
-}
+    </View>
+  );
+};
 
 Slider.defaultProps = {
   autoplay: false,
