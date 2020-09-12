@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Text as RNText, TextProps } from "react-native";
+import { Text as RNText, TextProps, TextStyle } from "react-native";
 
 import * as types from "../types";
 import context from "../context";
@@ -18,6 +18,7 @@ interface Props extends TextProps {
   h6?: boolean;
   paragraph?: boolean;
   label?: boolean;
+  modifiers?: string;
 }
 
 const defaults = {};
@@ -34,13 +35,8 @@ const buildStyle = (
     return "normal";
   };
 
-  const textAlign = () => {
-    return "center";
-  };
-
   const baseStyle = ({ bold }) => ({
     fontWeight: fontWeight(bold),
-    textAlign: textAlign(),
   });
 
   const sizeMapper = {
@@ -79,6 +75,7 @@ export default ({
   h6,
   paragraph,
   label,
+  modifiers = "",
   ...props
 }: Props) => {
   const [, i18nDispatcher] = useI18n();
@@ -91,12 +88,26 @@ export default ({
   const size = Object.keys(sizesObject).find((key) => sizesObject[key]) || "h1";
 
   const styles = buildStyle(themeState, size, { bold });
+
+  const contextModifiers = contextObj.state.modifiers(themeState.color);
+  const modifierStyles = modifiers.split(" ").reduce((acc, val) => {
+    if (!contextModifiers[val]) {
+      return acc;
+    }
+
+    return {
+      ...acc,
+      ...contextModifiers[val],
+    };
+  }, {});
+
   return (
     <RNText
       {...props}
       style={{
         fontFamily: contextObj.state.fontFamily,
         ...styles,
+        ...modifierStyles,
         ...props.style,
       }}
     >

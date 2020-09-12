@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   View,
   StatusBar,
@@ -11,32 +11,29 @@ import {
 import styles from "./index.styles";
 
 interface ITopBar {
-  image: string | { uri: string };
+  image?: string | { uri: string };
   backgroundColor: string;
   toHeight: number;
   fadeinDuration: number;
   enable?: boolean;
   fadeoutAfter?: number;
   fadeoutDuration?: number;
-  fadeout?: boolean;
-  open?: boolean;
   swipable?: boolean;
   onFadeIn(): void;
   onFadeOut(): void;
   willFadeOut(): void;
   willFadeIn(): void;
   toWidth?: number;
-  renderContent(): any;
+  renderContent?(): any;
   opacity?: number;
 }
 
 const TopBar = ({
   fadeinDuration,
-  open,
   fadeoutDuration,
   swipable,
   toHeight,
-  fadeout,
+  fadeoutAfter,
   toWidth,
   backgroundColor,
   opacity,
@@ -52,7 +49,8 @@ const TopBar = ({
     duration: fadeinDuration,
     useNativeDriver: false,
   };
-
+  const [hideContent, setHideContent] = useState(false);
+  const [fadedIn, setFadedIn] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const _panResponder = useMemo(
@@ -61,6 +59,8 @@ const TopBar = ({
         onMoveShouldSetPanResponder: (evt, gestureState) => true,
         onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
         onPanResponderMove: (evt, gestureState) => {
+          // Hide content when reponder has enough movement
+          setHideContent(gestureState.moveY < toHeight / 1.2);
           if (gestureState.moveY < toHeight) {
             Animated.timing(fadeAnim, {
               toValue: gestureState.moveY,
@@ -93,7 +93,10 @@ const TopBar = ({
 
   const runAnimations = () => {
     fadeIn(() => {
-      fadeout && fadeOut(fadeoutDuration);
+      !!fadeoutAfter &&
+        setTimeout(() => {
+          fadeOut(fadeoutDuration);
+        }, fadeoutAfter);
     });
   };
 
@@ -102,6 +105,7 @@ const TopBar = ({
     Animated.timing(fadeAnim, toolbarAnimation).start(() => {
       next && next();
       onFadeIn();
+      setFadedIn(true);
     });
   };
 
@@ -115,11 +119,6 @@ const TopBar = ({
     willFadeOut();
     Animated.timing(fadeAnim, toolbarFadeoutAnimation).start(onFadeOut);
   };
-
-  useEffect(() => {
-    open && fadeIn();
-    open || fadeOut(fadeoutDuration);
-  }, [open]);
 
   return (
     <View style={[styles.mainContainer, { top: 0 }]}>
@@ -135,7 +134,7 @@ const TopBar = ({
         ]}
         {...(swipable && _panResponder.panHandlers)}
       >
-        {renderContent && renderContent()}
+        {fadedIn && renderContent && (hideContent || renderContent())}
         {image && (
           <SafeAreaView
             style={{

@@ -11,10 +11,13 @@ interface ISlider {
   autoplayInterval?: number;
   loop?: boolean;
   autoplay?: boolean;
+  bounces?: boolean;
   defaultPaginationInactiveColor?: string;
   defaultPaginationActiveColor?: string;
   renderCustomPagination?(index: number): void;
   onIndexChange(): void;
+  overridePagination?: any;
+  height?: number;
 }
 let autoPlayIntervalRef: any = null;
 let scrollStartAt: any;
@@ -31,6 +34,7 @@ const Slider = ({
   defaultPaginationInactiveColor,
   defaultPaginationActiveColor,
   height,
+  bounces,
 }: ISlider) => {
   let listRef = useRef();
   const [state, dispatch] = useState({
@@ -222,6 +226,7 @@ const Slider = ({
         onTouchCancel={_handleTouchCancel}
         onTouchEndCapture={_handleTouchCancel}
         pagingEnabled
+        bounces={bounces}
       />
       <View onTouchStart={_handleTouchStart} onTouchEnd={_handleTouchEnd}>
         {renderCustomPagination && (
@@ -268,5 +273,6 @@ Slider.defaultProps = {
   onIndexChange: () => {},
   renderCustomPagination: () => {},
   loop: false,
+  bounces: true,
 };
 export default Slider;
