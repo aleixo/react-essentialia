@@ -204,6 +204,7 @@ the element and only the element are set on the modifiers object on provider. Th
 - [x] Must allow to add new themes to the lib provider and used with components
 - [x] Storybook or sample app
 - [x] Change name to react-native-essentialia
+- [ ] Build mechanism with standard props
 - [ ] Add Cell component and several variants
 - [ ] Manage forms
 - [ ] Clean unused code

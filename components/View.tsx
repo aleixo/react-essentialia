@@ -16,6 +16,7 @@ interface Props extends ViewProps {
   xAlign?: "center" | "space-between" | "flex-start" | "flex-end" | "stretch";
   yAlign?: "center" | "space-between" | "flex-start" | "flex-end" | "stretch";
   mb?: number;
+  mt?: number;
   p?: number;
   m?: number;
   ml?: number;
@@ -39,6 +40,7 @@ const View = ({
   flexWeight = 1,
   size = 0,
   mb = 0,
+  mt = 0,
   p = 0,
   m = 0,
   ml = 0,
@@ -77,9 +79,10 @@ const View = ({
   };
 
   const marginsStyle = {
-    marginBottom: mb,
     padding: p,
     margin: m,
+    marginTop: mt,
+    marginBottom: mb,
     marginRight: mr,
     marginLeft: ml,
   };

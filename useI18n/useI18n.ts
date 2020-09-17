@@ -34,7 +34,7 @@ const useI18n = (): [stateType, hookDispatcher] => {
 
   const setLanguage = (newLanguage) => {
     dispatchSubscribers({
-      lang: newLanguage,
+      lang: newLanguage.toUpperCase(),
     });
   };
 

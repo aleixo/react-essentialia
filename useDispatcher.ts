@@ -14,6 +14,7 @@ const useDispatcher = (): IDispatcher => {
   const i18ncontextValue = useContext<II18nContext>(i18nContext);
 
   const dispatchI18nSubscribers = (newState: any) => {
+    console.log("---- ", newState);
     Object.keys(i18ncontextValue.subscribers).forEach((key: string) => {
       i18ncontextValue.subscribers[key]({
         ...i18ncontextValue.state,

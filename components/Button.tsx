@@ -221,7 +221,7 @@ const Button = ({
     >
       {title && (
         <Text
-          label
+          h5
           style={{
             ...modifier.text,
           }}

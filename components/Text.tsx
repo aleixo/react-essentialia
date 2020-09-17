@@ -63,8 +63,8 @@ const buildStyle = (
   const componentDefault = {
     color: color.text,
     fontSize: sizes[sizeMapper[name]],
-    fontFamily: undefined,
     borderWidth: 0,
+    textAlign: "center",
   };
 
   return {
