@@ -44,7 +44,8 @@ const useTheme = (): [IThemeState, TDispatcher] => {
 
     dispatchSubscribers({
       sizes: scaledSizes,
-      color: contextValue.state.colors[theme],
+      color:
+        contextValue.state.colors[theme] || contextValue.state.colors.default,
       fontScale,
       theme,
     });

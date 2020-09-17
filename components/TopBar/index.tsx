@@ -9,6 +9,7 @@ import {
 } from "react-native";
 
 import styles from "./index.styles";
+import { useTheme } from "../../..";
 
 interface ITopBar {
   image?: string | { uri: string };
@@ -51,6 +52,7 @@ const TopBar = ({
   };
   const [hideContent, setHideContent] = useState(false);
   const [fadedIn, setFadedIn] = useState(false);
+  const [themeState] = useTheme();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const _panResponder = useMemo(
@@ -128,7 +130,8 @@ const TopBar = ({
           {
             width: Dimensions.get("window").width / (toWidth || 1.5),
             height: fadeAnim,
-            backgroundColor,
+            backgroundColor:
+              themeState.color[backgroundColor] || backgroundColor,
             opacity,
           },
         ]}

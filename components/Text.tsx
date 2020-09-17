@@ -6,9 +6,11 @@ import context from "../context";
 import { useI18n } from "../useI18n";
 import { useTheme } from "../useTheme";
 
+type TStateFunction = ({ theme }: { theme: types.IThemeState }) => void;
+
 interface Props extends TextProps {
   children: any;
-  bold?: boolean;
+  bold?: boolean | TStateFunction;
   center?: boolean;
   h1?: boolean;
   h2?: boolean;
@@ -22,6 +24,14 @@ interface Props extends TextProps {
 }
 
 const defaults = {};
+
+const isFunctionSolveIt = (states, maybeFn) => {
+  if (typeof maybeFn !== "function") {
+    return maybeFn;
+  }
+
+  return maybeFn(states);
+};
 
 const buildStyle = (
   { color, sizes }: types.IThemeState,
@@ -87,19 +97,24 @@ export default ({
   const sizesObject = { h1, h2, h3, h4, h5, h6, paragraph, label };
   const size = Object.keys(sizesObject).find((key) => sizesObject[key]) || "h1";
 
-  const styles = buildStyle(themeState, size, { bold });
+  const styles = buildStyle(themeState, size, {
+    bold: isFunctionSolveIt({ theme: themeState }, bold),
+  });
 
-  const contextModifiers = contextObj.state.modifiers(themeState.color);
-  const modifierStyles = modifiers.split(" ").reduce((acc, val) => {
-    if (!contextModifiers[val]) {
-      return acc;
-    }
+  const contextModifiers =
+    contextObj.state.modifiers && contextObj.state.modifiers(themeState.color);
+  const modifierStyles =
+    contextModifiers &&
+    modifiers.split(" ").reduce((acc, val) => {
+      if (!contextModifiers[val]) {
+        return acc;
+      }
 
-    return {
-      ...acc,
-      ...contextModifiers[val],
-    };
-  }, {});
+      return {
+        ...acc,
+        ...contextModifiers[val],
+      };
+    }, {});
 
   return (
     <RNText

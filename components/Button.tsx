@@ -104,6 +104,7 @@ interface Props extends ButtonProps {
   langToggle?: string[];
   fontScaleToggle?: number[];
   themeToggle?: string[];
+  style?: ViewStyle;
   modifiers?: "round" | "bordered" | string;
 }
 
@@ -196,6 +197,13 @@ const Button = ({
     providerModifiers,
   });
 
+  if (
+    (themeToggle || fontScaleToggle || langToggle) &&
+    onToggle &&
+    state.toggled
+  ) {
+    onToggle(state.toggled);
+  }
   return (
     <TouchableOpacity
       {...props}
@@ -211,13 +219,7 @@ const Button = ({
       }}
       onPress={onTouchablePress}
     >
-      {(themeToggle || fontScaleToggle || langToggle) &&
-      onToggle &&
-      state.toggled ? (
-        onToggle(state.toggled)
-      ) : children ? (
-        children
-      ) : (
+      {title && (
         <Text
           label
           style={{
@@ -227,6 +229,7 @@ const Button = ({
           {title}
         </Text>
       )}
+      {children}
     </TouchableOpacity>
   );
 };

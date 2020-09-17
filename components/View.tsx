@@ -34,6 +34,8 @@ const View = ({
   row,
   xAlign,
   yAlign,
+  style,
+  screen,
   flexWeight = 1,
   size = 0,
   mb = 0,
@@ -41,13 +43,10 @@ const View = ({
   m = 0,
   ml = 0,
   mr = 0,
-  style,
-  screen,
   ...props
 }: Props) => {
   const [themeState] = useTheme();
 
-  const DEFAULT_SHADOW_RADIUS = 2.62;
   const roundStyle = {
     width: size,
     height: size,
