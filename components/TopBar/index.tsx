@@ -76,7 +76,7 @@ const TopBar = ({
           const closing = toValue === 0;
 
           closing ? willFadeOut() : willFadeIn();
-
+          setHideContent(closing);
           Animated.timing(fadeAnim, {
             toValue,
             duration: 200,

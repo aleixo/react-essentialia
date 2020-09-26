@@ -9,9 +9,9 @@ export default StyleSheet.create({
     bottom: 10,
   },
   defaultPaginationItem: {
-    borderRadius: 5 / 2,
-    width: 5,
-    height: 5,
+    borderRadius: 6 / 2,
+    width: 6,
+    height: 6,
     marginHorizontal: 1,
     backgroundColor: "blue",
   },

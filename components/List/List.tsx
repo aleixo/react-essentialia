@@ -1,33 +1,14 @@
-import React from 'react';
-import { FlatList, Text } from 'react-native';
+import React from "react";
+import { FlatList } from "react-native";
 
-const List = ({
-  title,
-  datasource,
-  titleStyle,
-  item,
-  listStyle,
-  horizontal,
-}) => {
+const List = ({ data, item, horizontal, draggable }) => {
   return (
-    <>
-      <Text
-        style={{
-          fontSize: 16,
-          fontWeight: 'bold',
-          marginBottom: 5,
-          ...titleStyle,
-        }}>
-        {title}
-      </Text>
-      <FlatList
-        keyExtractor={(item, index) => 'key' + index}
-        style={{ marginBottom: 30, ...listStyle }}
-        data={datasource}
-        horizontal={horizontal}
-        renderItem={item}
-      />
-    </>
+    <FlatList
+      keyExtractor={(item, index) => "key_" + index}
+      data={data}
+      horizontal={horizontal}
+      renderItem={item}
+    />
   );
 };
 

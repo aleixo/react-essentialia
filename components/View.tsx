@@ -8,7 +8,7 @@ import { useTheme } from "../..";
 interface Props extends ViewProps {
   shadow?: Boolean;
   shadowRadius?: number;
-  children: any;
+  children?: any;
   round?: boolean;
   size?: number;
   row?: boolean;
@@ -37,7 +37,7 @@ const View = ({
   yAlign,
   style,
   screen,
-  flexWeight = 1,
+  flexWeight,
   size = 0,
   mb = 0,
   mt = 0,
@@ -79,12 +79,12 @@ const View = ({
   };
 
   const marginsStyle = {
-    padding: p,
-    margin: m,
     marginTop: mt,
     marginBottom: mb,
     marginRight: mr,
     marginLeft: ml,
+    padding: p,
+    margin: m,
   };
 
   const createStylesheet = () => {
@@ -111,7 +111,6 @@ const View = ({
         styles.shadow,
         styles.round,
         styles.customStyle,
-        styles.extensions,
       ]}
     >
       {children}

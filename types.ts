@@ -27,6 +27,7 @@ export interface sizes {
 
 export type TAllowedModifiers = {
   color?: string;
+  fontFamily?: string;
 };
 
 export type TModifiers = (

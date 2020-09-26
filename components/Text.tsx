@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Text as RNText, TextProps, TextStyle } from "react-native";
+import { Platform, Text as RNText, TextProps, TextStyle } from "react-native";
 
 import * as types from "../types";
 import context from "../context";
@@ -63,8 +63,6 @@ const buildStyle = (
   const componentDefault = {
     color: color.text,
     fontSize: sizes[sizeMapper[name]],
-    borderWidth: 0,
-    textAlign: "center",
   };
 
   return {
@@ -116,16 +114,20 @@ export default ({
       };
     }, {});
 
+  const style = {
+    fontFamily: contextObj.state.fontFamily,
+    ...styles,
+    ...modifierStyles,
+    ...props.style,
+  };
+
+  if (style.fontFamily && bold) {
+    style.fontWeight = Platform.select({ ios: "bold", android: "normal" });
+    style.fontFamily = `${style.fontFamily.split("-")[0]}-Bold`;
+  }
+
   return (
-    <RNText
-      {...props}
-      style={{
-        fontFamily: contextObj.state.fontFamily,
-        ...styles,
-        ...modifierStyles,
-        ...props.style,
-      }}
-    >
+    <RNText {...props} style={style}>
       {ownChildren}
     </RNText>
   );

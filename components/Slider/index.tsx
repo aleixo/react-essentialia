@@ -12,12 +12,13 @@ interface ISlider {
   loop?: boolean;
   autoplay?: boolean;
   bounces?: boolean;
-  defaultPaginationInactiveColor?: string;
-  defaultPaginationActiveColor?: string;
+  inactivePaginationDotColor?: string;
+  activePaginationDotColor?: string;
   renderCustomPagination?(index: number): void;
   onIndexChange(): void;
   overridePagination?: any;
   height?: number;
+  dotSize?: number;
 }
 let autoPlayIntervalRef: any = null;
 let scrollStartAt: any;
@@ -31,10 +32,11 @@ const Slider = ({
   onIndexChange,
   renderCustomPagination,
   overridePagination,
-  defaultPaginationInactiveColor,
-  defaultPaginationActiveColor,
+  inactivePaginationDotColor,
+  activePaginationDotColor,
   height,
   bounces,
+  dotSize,
 }: ISlider) => {
   let listRef = useRef();
   const [state, dispatch] = useState({
@@ -247,11 +249,18 @@ const Slider = ({
                 key={index}
                 style={[
                   styles.defaultPaginationItem,
+                  dotSize
+                    ? {
+                        borderRadius: dotSize / 2,
+                        width: dotSize,
+                        height: dotSize,
+                      }
+                    : undefined,
                   {
                     backgroundColor:
                       state.currentIndex === index
-                        ? defaultPaginationActiveColor
-                        : defaultPaginationInactiveColor,
+                        ? activePaginationDotColor
+                        : inactivePaginationDotColor,
                   },
                 ]}
               />
@@ -267,8 +276,8 @@ Slider.defaultProps = {
   autoplay: false,
   overridePagination: false,
   autoplayInterval: 3000,
-  defaultPaginationActiveColor: "black",
-  defaultPaginationInactiveColor: "white",
+  activePaginationDotColor: "black",
+  inactivePaginationDotColor: "white",
   children: [],
   onIndexChange: () => {},
   renderCustomPagination: () => {},

@@ -43,9 +43,7 @@ const useI18n = (): [stateType, hookDispatcher] => {
       return path;
     }
     return path.split(" ").reduce((acc, val) => {
-      return `${acc} ${
-        objects.byString(state.strings[state.lang], val) || val
-      }`;
+      return `${acc}${objects.byString(state.strings[state.lang], val) || val}`;
     }, "");
   };
 
