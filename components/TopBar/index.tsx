@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import styles from "./index.styles";
-import { useTheme } from "../../..";
+import { useTheme } from "../../useTheme";
 
 interface ITopBar {
   image?: string | { uri: string };

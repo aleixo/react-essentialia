@@ -11,6 +11,7 @@ import {
   Slider,
   Tabs,
   Text,
+  FlatList,
 } from "./components";
 import Provider from "./Provider";
 import useDispatcher from "./useDispatcher";
@@ -37,4 +38,5 @@ export {
   Tabs,
   Text,
   Provider,
+  FlatList,
 };

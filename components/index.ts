@@ -1,4 +1,3 @@
-import HtmlParser from "./HtmlParser";
 import Popup from "./Popup";
 import Button from "./Button";
 import Overlay from "./Overlay";
@@ -10,6 +9,7 @@ import TopBar from "./TopBar";
 import FullScreenImage from "./FullScreenImage";
 import Slider from "./Slider";
 import BackgroundOverlay from "./BackgroundOverlay";
+import FlatList from "./FlatList";
 
 export {
   BackgroundOverlay,
@@ -17,11 +17,11 @@ export {
   FullScreenImage,
   TopBar,
   Text,
-  HtmlParser,
   Popup,
   Button,
   Overlay,
   View,
   Tabs,
   LocalizedPopup,
+  FlatList,
 };

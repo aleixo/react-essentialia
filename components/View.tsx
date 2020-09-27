@@ -1,9 +1,7 @@
 import React, { useContext, useState } from "react";
 import { View as RNView, StyleSheet, ViewProps, ViewStyle } from "react-native";
 
-import context from "../context";
-import { Uuid } from "../helpers";
-import { useTheme } from "../..";
+import { useTheme } from "../useTheme";
 
 interface Props extends ViewProps {
   shadow?: Boolean;
