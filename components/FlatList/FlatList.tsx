@@ -50,10 +50,7 @@ const PRESS_INTERVAL = 150;
  * - example of usage:
  * <FlatList
       draggable
-      onDrop={(data) => {}}
-      lockDrag={(item) =>
-        item.num === 0 || item.num === 1 || item.num === 2 || item.num === 3
-      }
+      onDrop={(data) => {}}      
       style={{ marginBottom: 100, marginTop: 100, width: '100%', flex: 1 }}
       data={listData}
       renderItem={({ item, isDragging, pressed, longPress }) => {
