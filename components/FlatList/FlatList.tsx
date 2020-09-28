@@ -281,6 +281,7 @@ const List = ({
           style={{
             position: "absolute",
             zIndex: 2,
+            elevation: 2,
             width: "100%",
             height: dragValues.draggableheight,
             top: draggablePos.getLayout().top,
@@ -324,6 +325,7 @@ const List = ({
           return (
             <View
               {...(draggable ? panResponder.panHandlers : {})}
+              style={{ zIndex: 1, elevation: 1 }}
               onLayout={(e) => {
                 dragValues.itemHeights = {
                   ...dragValues.itemHeights,
