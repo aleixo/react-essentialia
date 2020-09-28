@@ -8,10 +8,13 @@ import {
 } from "react-native";
 
 type TOnDrop = (item: any) => void;
+type TLockDrag = (item: any) => boolean;
 
 interface IFlatList extends FlatListProps<any> {
   draggable?: boolean;
   onDrop?: TOnDrop;
+  draggableOpacity?: number;
+  lockDrag?: TLockDrag;
 }
 
 function moveArrayItems(arr, from, to) {
@@ -38,14 +41,22 @@ function moveArrayItems(arr, from, to) {
   }, []);
 }
 
-const LONG_PRESS_TIME = 700;
+const LONG_PRESS_TIME = 500;
+const PRESS_INTERVAL = 150;
 
-const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
+const List = ({
+  draggable,
+  data,
+  onDrop,
+  draggableOpacity = 0.9,
+  lockDrag,
+  ...flatListProps
+}: IFlatList) => {
   const [draggingIndex, setDraggingIndex] = useState(-1);
   const [movedToIndex, setMovedToIndex] = useState(-1);
   const [listData, setListData] = useState(data);
   const [mode, setMode] = useState<
-    "IDLE" | "LOCK_SCROLL" | "LONG_PRESS" | "DRAGGING"
+    "IDLE" | "LONG_PRESS" | "PRESS" | "DRAGGING"
   >("IDLE");
 
   const flatlistRef = useRef<FlatList<any>>(null);
@@ -58,6 +69,8 @@ const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
     currentY: number;
     currLongPressedId: number;
     longPressInterval?: NodeJS.Timeout;
+    pressInterval?: NodeJS.Timeout;
+    itemHeights: { [key in string]: number };
   } = useRef({
     scrollYContentOffset: 0,
     draggableheight: 0,
@@ -67,6 +80,8 @@ const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
     currentY: 0,
     currLongPressedId: -1,
     longPressInterval: undefined,
+    pressInterval: undefined,
+    itemHeights: {},
   }).current;
   const draggablePos = useRef(new Animated.ValueXY()).current;
   const panResponder = useRef(
@@ -86,25 +101,45 @@ const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
       },
 
       onPanResponderGrant: (evt, gestureState) => {
-        setDraggingIndex(currentDraggingIndex(gestureState.y0));
+        const currIndex = currentDraggingIndex(gestureState.y0);
+        setDraggingIndex(currIndex);
         setMode("IDLE");
         // Set long press interval
+        dragValues.pressInterval = setTimeout(() => {
+          dragValues.pressInterval = undefined;
+        }, PRESS_INTERVAL);
         dragValues.longPressInterval = setTimeout(() => {
           Animated.event([{ y: draggablePos.y }])({
-            y: gestureState.y0 - dragValues.draggableheight / 2,
+            y: gestureState.y0 - dragValues.itemHeights[currIndex] / 2,
           });
 
           startDragging();
         }, LONG_PRESS_TIME);
       },
       onPanResponderMove: (evt, gestureState) => {
+        //Stop dragging when outside bounds
+        if (
+          gestureState.moveY < dragValues.listYOffset ||
+          gestureState.moveY > dragValues.listHeight + dragValues.listYOffset
+        ) {
+          stopDragging();
+          return;
+        }
         dragValues.currentY = gestureState.moveY;
-
-        setMovedToIndex(currentDraggingIndex(gestureState.moveY));
+        const currIndex = currentDraggingIndex(gestureState.moveY);
+        setMovedToIndex(currIndex);
 
         Animated.event([{ y: draggablePos.y }])({
-          y: gestureState.moveY - dragValues.draggableheight / 2,
+          y: gestureState.moveY - dragValues.itemHeights[currIndex] / 2,
         });
+
+        if (mode === "DRAGGING") {
+          dragValues.itemHeights = {
+            ...dragValues.itemHeights,
+            [draggingIndex]: dragValues.itemHeights[currIndex],
+            [currIndex]: dragValues.itemHeights[currIndex],
+          };
+        }
       },
       onPanResponderTerminationRequest: (evt, gestureState) => false,
       onPanResponderRelease: (evt, gestureState) => {
@@ -119,6 +154,7 @@ const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
   //When we move while dragging set the new dragging index and update the data with the new order
   useEffect(() => {
     setDraggingIndex(movedToIndex);
+
     mode === "DRAGGING" &&
       setListData(moveArrayItems(listData, draggingIndex, movedToIndex));
   }, [movedToIndex]);
@@ -137,16 +173,17 @@ const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
     const SCROLL_OFFSET = 10;
     requestAnimationFrame(() => {
       if (
-        dragValues.currentY + THRESHOLD < dragValues.listHeight &&
-        dragValues.currentY > THRESHOLD
+        dragValues.currentY > THRESHOLD + dragValues.listYOffset &&
+        dragValues.currentY + THRESHOLD <
+          dragValues.listHeight + dragValues.listYOffset
       ) {
         return;
       }
 
-      const offset =
-        dragValues.currentY < THRESHOLD
-          ? dragValues.scrollYContentOffset - SCROLL_OFFSET
-          : dragValues.scrollYContentOffset + SCROLL_OFFSET;
+      const isOnTop = dragValues.currentY < THRESHOLD + dragValues.listYOffset;
+      const offset = isOnTop
+        ? dragValues.scrollYContentOffset - SCROLL_OFFSET
+        : dragValues.scrollYContentOffset + SCROLL_OFFSET;
       flatlistRef.current?.scrollToOffset({
         animated: false,
         offset,
@@ -157,15 +194,18 @@ const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
   };
 
   const currentDraggingIndex = (y) => {
-    const res = Math.floor(
-      (dragValues.scrollYContentOffset + y - dragValues.listYOffset) /
-        dragValues.draggableheight
-    );
-    if (res <= -1 || res >= listData?.length) {
-      return -1;
-    }
+    const realY = dragValues.scrollYContentOffset + y - dragValues.listYOffset;
 
-    return res;
+    let sizeCount = 0;
+    for (let i = 0; i < listData?.length; i++) {
+      const currSizeCount = dragValues.itemHeights[i];
+      if (realY > sizeCount && realY < sizeCount + currSizeCount) {
+        return i;
+      }
+
+      sizeCount = sizeCount + currSizeCount;
+    }
+    return -1;
   };
 
   const startDragging = () => {
@@ -173,10 +213,13 @@ const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
     setMode("DRAGGING");
   };
 
+  //ALTURAS DINAMICAS
   const stopDragging = () => {
     if (dragValues.longPressInterval) {
+      dragValues.pressInterval ? setMode("PRESS") : setMode("LONG_PRESS");
+
       clearTimeout(dragValues.longPressInterval);
-      setMode("LONG_PRESS");
+      dragValues.pressInterval && clearTimeout(dragValues.pressInterval);
       return;
     }
 
@@ -184,7 +227,7 @@ const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
     setDraggingIndex(-1);
     onDrop && onDrop(listData);
   };
-  console.log("mode", mode);
+
   return (
     <>
       {mode === "DRAGGING" && (
@@ -194,9 +237,8 @@ const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
             zIndex: 2,
             width: "100%",
             height: dragValues.draggableheight,
-            backgroundColor: "red",
             top: draggablePos.getLayout().top,
-            opacity: 0.9,
+            opacity: draggableOpacity,
           }}
         >
           {flatListProps.renderItem &&
@@ -221,12 +263,13 @@ const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
         }}
         scrollEnabled={mode !== "DRAGGING"}
         renderItem={({ item, index }) => {
-          let longPressed = index === draggingIndex && mode === "LONG_PRESS";
+          let longPress = index === draggingIndex && mode === "LONG_PRESS";
+          let pressed = index === draggingIndex && mode === "PRESS";
           if (dragValues.currLongPressedId === index && mode === "LONG_PRESS") {
-            longPressed = false;
+            pressed = false;
             dragValues.currLongPressedId = -1;
           } else if (
-            longPressed &&
+            pressed &&
             dragValues.currLongPressedId === -1 &&
             mode === "LONG_PRESS"
           ) {
@@ -236,14 +279,18 @@ const List = ({ draggable, data, onDrop, ...flatListProps }: IFlatList) => {
             <View
               {...(draggable ? panResponder.panHandlers : {})}
               onLayout={(e) => {
-                dragValues.draggableheight = e.nativeEvent.layout.height;
+                dragValues.itemHeights = {
+                  ...dragValues.itemHeights,
+                  [index]: e.nativeEvent.layout.height,
+                };
               }}
             >
               {flatListProps.renderItem &&
                 flatListProps.renderItem({
                   item,
                   isDragging: index === draggingIndex && mode === "DRAGGING",
-                  longPressed,
+                  longPress,
+                  pressed,
                 })}
             </View>
           );
