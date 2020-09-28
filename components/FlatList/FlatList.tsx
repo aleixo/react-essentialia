@@ -44,6 +44,38 @@ function moveArrayItems(arr, from, to) {
 const LONG_PRESS_TIME = 500;
 const PRESS_INTERVAL = 150;
 
+/**
+ * FlatList allowing  dragging items
+ * 
+ * - example of usage:
+ * <FlatList
+      draggable
+      onDrop={(data) => {}}
+      lockDrag={(item) =>
+        item.num === 0 || item.num === 1 || item.num === 2 || item.num === 3
+      }
+      style={{ marginBottom: 100, marginTop: 100, width: '100%', flex: 1 }}
+      data={listData}
+      renderItem={({ item, isDragging, pressed, longPress }) => {
+        return (
+          <View
+            style={{
+              padding: 15,
+              backgroundColor: item.color,
+              opacity: isDragging ? 0 : 1,
+              flexDirection: 'row',
+              height: item.height,
+              alignItems: 'center',
+            }}>
+            <Text>Olá - {item.num}</Text>
+            <Text paragraph>LONG PRESSS {longPress ? 1 : 0}</Text>
+            <Text paragraph>CLICK {pressed ? 1 : 0}</Text>
+          </View>
+        );
+      }}
+      keyExtractor={(item) => 'key' + item.num}
+    />
+ */
 const List = ({
   draggable,
   data,
@@ -164,6 +196,7 @@ const List = ({
     infiniteScroll();
   }, [draggingIndex]);
 
+  // Scroll when at the edge of the flatlist
   const infiniteScroll = () => {
     if (mode !== "DRAGGING") {
       return;
@@ -193,6 +226,15 @@ const List = ({
     });
   };
 
+  /**
+   * Compute the index based on the current y
+   *
+   * If will use dragValues.itemHeights do see where the y is
+   *
+   * @param {number} y - The y to compute the index
+   *
+   * @returns {number} - The index
+   */
   const currentDraggingIndex = (y) => {
     const realY = dragValues.scrollYContentOffset + y - dragValues.listYOffset;
 
@@ -208,12 +250,19 @@ const List = ({
     return -1;
   };
 
+  // delete longpressinterval and set mode to dragging
   const startDragging = () => {
     dragValues.longPressInterval = undefined;
     setMode("DRAGGING");
   };
 
-  //ALTURAS DINAMICAS
+  /**
+   * Three event come from here
+   *
+   * - Normal press
+   * - Long press
+   * - Idle the responder
+   */
   const stopDragging = () => {
     if (dragValues.longPressInterval) {
       dragValues.pressInterval ? setMode("PRESS") : setMode("LONG_PRESS");
