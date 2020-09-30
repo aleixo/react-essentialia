@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   FlatList,
   FlatListProps,
@@ -6,6 +6,7 @@ import {
   PanResponder,
   Animated,
 } from "react-native";
+import useList from "./useList";
 
 type TOnDrop = (item: any) => void;
 type TLockDrag = (item: any) => boolean;
@@ -15,30 +16,6 @@ interface IFlatList extends FlatListProps<any> {
   onDrop?: TOnDrop;
   draggableOpacity?: number;
   lockDrag?: TLockDrag;
-}
-
-function moveArrayItems(arr, from, to) {
-  if (from === -1 || to === -1) {
-    return arr;
-  }
-  return arr.reduce((prev, current, idx, self) => {
-    if (from === to) {
-      prev.push(current);
-    }
-    if (idx === from) {
-      return prev;
-    }
-    if (from < to) {
-      prev.push(current);
-    }
-    if (idx === to) {
-      prev.push(self[from]);
-    }
-    if (from > to) {
-      prev.push(current);
-    }
-    return prev;
-  }, []);
 }
 
 const LONG_PRESS_TIME = 500;
@@ -52,7 +29,7 @@ const PRESS_INTERVAL = 150;
       draggable
       onDrop={(data) => {}}      
       style={{ marginBottom: 100, marginTop: 100, width: '100%', flex: 1 }}
-      data={listData}
+      data={list}
       renderItem={({ item, isDragging, pressed, longPress }) => {
         return (
           <View
@@ -81,19 +58,19 @@ const List = ({
   lockDrag,
   ...flatListProps
 }: IFlatList) => {
-  const [draggingIndex, setDraggingIndex] = useState(-1);
-  const [movedToIndex, setMovedToIndex] = useState(-1);
-  const [listData, setListData] = useState(data);
-  const [mode, setMode] = useState<
-    "IDLE" | "LONG_PRESS" | "PRESS" | "DRAGGING"
-  >("IDLE");
+  const [
+    { selectedIndex, mode, list },
+    { setSelectedIndex, setMode, reorderList },
+  ] = useList(data);
 
+  const containerRef = useRef<View>(null);
   const flatlistRef = useRef<FlatList<any>>(null);
+
   const dragValues: {
     scrollYContentOffset: number;
     draggableheight: number;
     listYOffset: number;
-    draggingIndex: number;
+    selectedIndex: number;
     listHeight: number;
     currentY: number;
     currLongPressedId: number;
@@ -104,13 +81,16 @@ const List = ({
     scrollYContentOffset: 0,
     draggableheight: 0,
     listYOffset: 0,
-    draggingIndex: -1,
+    selectedIndex: -1,
     listHeight: 0,
     currentY: 0,
     currLongPressedId: -1,
     longPressInterval: undefined,
     pressInterval: undefined,
-    itemHeights: {},
+    //TODO: -1 should never be read but looks like it is sometimes. Needs some attention.
+    itemHeights: {
+      ["-1"]: 0,
+    },
   }).current;
   const draggablePos = useRef(new Animated.ValueXY()).current;
   const panResponder = useRef(
@@ -118,31 +98,25 @@ const List = ({
       onStartShouldSetPanResponder: (evt, gestureState) => true,
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
       // Prevent pan responder from stealing touches when long press mode
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
-        if (
-          mode === "LONG_PRESS" &&
-          currentDraggingIndex(gestureState.y0) === draggingIndex
-        ) {
-          return false;
-        }
-
-        return true;
-      },
-
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
       onPanResponderGrant: (evt, gestureState) => {
-        const currIndex = currentDraggingIndex(gestureState.y0);
-        setDraggingIndex(currIndex);
-        setMode("IDLE");
-        // Set long press interval
+        const currIndex = currentselectedIndex(gestureState.y0);
+        setSelectedIndex(currIndex);
+        dragValues.selectedIndex = currIndex;
+        dragValues.draggableheight = dragValues.itemHeights[currIndex];
+        // Normal click
         dragValues.pressInterval = setTimeout(() => {
           dragValues.pressInterval = undefined;
         }, PRESS_INTERVAL);
+
+        // Long press interval
         dragValues.longPressInterval = setTimeout(() => {
-          Animated.event([{ y: draggablePos.y }])({
+          Animated.event([{ y: draggablePos.y }], { useNativeDriver: false })({
             y: gestureState.y0 - dragValues.itemHeights[currIndex] / 2,
           });
 
-          startDragging();
+          dragValues.selectedIndex = currIndex;
+          startDragging(currIndex);
         }, LONG_PRESS_TIME);
       },
       onPanResponderMove: (evt, gestureState) => {
@@ -154,21 +128,23 @@ const List = ({
           stopDragging();
           return;
         }
+
         dragValues.currentY = gestureState.moveY;
-        const currIndex = currentDraggingIndex(gestureState.moveY);
-        setMovedToIndex(currIndex);
+        const currIndex = currentselectedIndex(dragValues.currentY);
 
-        Animated.event([{ y: draggablePos.y }])({
-          y: gestureState.moveY - dragValues.itemHeights[currIndex] / 2,
-        });
-
-        if (mode === "DRAGGING") {
+        if (dragValues.selectedIndex !== currIndex) {
+          reorderList(dragValues.selectedIndex, currIndex);
           dragValues.itemHeights = {
             ...dragValues.itemHeights,
-            [draggingIndex]: dragValues.itemHeights[currIndex],
-            [currIndex]: dragValues.itemHeights[currIndex],
+            [dragValues.selectedIndex]: dragValues.itemHeights[currIndex],
+            [currIndex]: dragValues.itemHeights[dragValues.selectedIndex],
           };
+          dragValues.selectedIndex = currIndex;
         }
+
+        Animated.event([{ y: draggablePos.y }], { useNativeDriver: false })({
+          y: gestureState.moveY - dragValues.itemHeights[currIndex] / 2,
+        });
       },
       onPanResponderTerminationRequest: (evt, gestureState) => false,
       onPanResponderRelease: (evt, gestureState) => {
@@ -180,18 +156,14 @@ const List = ({
     })
   ).current;
 
-  //When we move while dragging set the new dragging index and update the data with the new order
   useEffect(() => {
-    setDraggingIndex(movedToIndex);
-
-    mode === "DRAGGING" &&
-      setListData(moveArrayItems(listData, draggingIndex, movedToIndex));
-  }, [movedToIndex]);
+    onDrop && onDrop(list);
+  }, [JSON.stringify(list)]);
 
   // When updating the dragging index, start the infinite scroll
   useEffect(() => {
     infiniteScroll();
-  }, [draggingIndex]);
+  }, [selectedIndex]);
 
   // Scroll when at the edge of the flatlist
   const infiniteScroll = () => {
@@ -232,13 +204,13 @@ const List = ({
    *
    * @returns {number} - The index
    */
-  const currentDraggingIndex = (y) => {
+  const currentselectedIndex = (y) => {
     const realY = dragValues.scrollYContentOffset + y - dragValues.listYOffset;
 
     let sizeCount = 0;
-    for (let i = 0; i < listData?.length; i++) {
+    for (let i = 0; i < list?.length; i++) {
       const currSizeCount = dragValues.itemHeights[i];
-      if (realY > sizeCount && realY < sizeCount + currSizeCount) {
+      if (realY >= sizeCount && realY <= sizeCount + currSizeCount) {
         return i;
       }
 
@@ -248,9 +220,9 @@ const List = ({
   };
 
   // delete longpressinterval and set mode to dragging
-  const startDragging = () => {
+  const startDragging = (index: number) => {
     dragValues.longPressInterval = undefined;
-    setMode("DRAGGING");
+    setMode("DRAGGING", index);
   };
 
   /**
@@ -262,7 +234,9 @@ const List = ({
    */
   const stopDragging = () => {
     if (dragValues.longPressInterval) {
-      dragValues.pressInterval ? setMode("PRESS") : setMode("LONG_PRESS");
+      dragValues.pressInterval
+        ? setMode("PRESS", dragValues.selectedIndex)
+        : setMode("LONG_PRESS", dragValues.selectedIndex);
 
       clearTimeout(dragValues.longPressInterval);
       dragValues.pressInterval && clearTimeout(dragValues.pressInterval);
@@ -270,12 +244,17 @@ const List = ({
     }
 
     setMode("IDLE");
-    setDraggingIndex(-1);
-    onDrop && onDrop(listData);
   };
 
   return (
-    <>
+    <View
+      ref={containerRef}
+      onLayout={() => {
+        containerRef.current.measureInWindow((x: number, y: number) => {
+          dragValues.listYOffset = y;
+        });
+      }}
+    >
       {mode === "DRAGGING" && (
         <Animated.View
           style={{
@@ -283,21 +262,20 @@ const List = ({
             zIndex: 2,
             elevation: 2,
             width: "100%",
-            height: dragValues.draggableheight,
             top: draggablePos.getLayout().top,
             opacity: draggableOpacity,
           }}
         >
           {flatListProps.renderItem &&
             flatListProps.renderItem({
-              item: listData[draggingIndex],
+              item: list[selectedIndex],
             })}
         </Animated.View>
       )}
       <FlatList
         {...flatListProps}
         ref={flatlistRef}
-        data={listData}
+        data={list}
         onScroll={(e) => {
           dragValues.scrollYContentOffset = e.nativeEvent.contentOffset.y;
           dragValues.longPressInterval &&
@@ -310,8 +288,8 @@ const List = ({
         }}
         scrollEnabled={mode !== "DRAGGING"}
         renderItem={({ item, index }) => {
-          let longPress = index === draggingIndex && mode === "LONG_PRESS";
-          let pressed = index === draggingIndex && mode === "PRESS";
+          let longPress = index === selectedIndex && mode === "LONG_PRESS";
+          let pressed = index === selectedIndex && mode === "PRESS";
           if (dragValues.currLongPressedId === index && mode === "LONG_PRESS") {
             pressed = false;
             dragValues.currLongPressedId = -1;
@@ -336,7 +314,7 @@ const List = ({
               {flatListProps.renderItem &&
                 flatListProps.renderItem({
                   item,
-                  isDragging: index === draggingIndex && mode === "DRAGGING",
+                  isDragging: index === selectedIndex && mode === "DRAGGING",
                   longPress,
                   pressed,
                 })}
@@ -344,7 +322,7 @@ const List = ({
           );
         }}
       />
-    </>
+    </View>
   );
 };
 
