@@ -132,6 +132,7 @@ const List = ({
         dragValues.currentY = gestureState.moveY;
         const currIndex = currentselectedIndex(dragValues.currentY);
 
+        // If the selected indexis diferent from the one we are detecting, we need to reorder the list
         if (dragValues.selectedIndex !== currIndex) {
           reorderList(dragValues.selectedIndex, currIndex);
           dragValues.itemHeights = {
