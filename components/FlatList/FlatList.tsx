@@ -59,7 +59,7 @@ const List = ({
   ...flatListProps
 }: IFlatList) => {
   const [
-    { selectedIndex, mode, list },
+    { selectedIndex, mode, list, dropped },
     { setSelectedIndex, setMode, reorderList },
   ] = useList(data);
 
@@ -158,8 +158,8 @@ const List = ({
   ).current;
 
   useEffect(() => {
-    onDrop && onDrop(list);
-  }, [JSON.stringify(list)]);
+    dropped && onDrop && onDrop(list);
+  }, [dropped]);
 
   // When updating the dragging index, start the infinite scroll
   useEffect(() => {

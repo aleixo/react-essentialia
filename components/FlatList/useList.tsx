@@ -2,7 +2,12 @@ import { useReducer } from "react";
 
 type TActionTypes = "SET_MODE" | "SET_SELECTED_INDEX";
 type TModes = "IDLE" | "LONG_PRESS" | "PRESS" | "DRAGGING";
-type TState = { mode: TModes; selectedIndex: number; list: any };
+type TState = {
+  mode: TModes;
+  selectedIndex: number;
+  list: any;
+  dropped: boolean;
+};
 type TDispatch = {
   setSelectedIndex(index: number): void;
   setMode(mode: TModes, index?: number): void;
@@ -22,6 +27,7 @@ const setMode = (state: TState, action: TAction) => ({
   ...state,
   mode: action.mode,
   selectedIndex: action.index || -1,
+  dropped: state.mode === "DRAGGING" && action.mode === "IDLE",
 });
 
 const setSelectedIndex = (state: TState, action: TAction) => ({
