@@ -269,7 +269,7 @@ const List = ({
         >
           {flatListProps.renderItem &&
             flatListProps.renderItem({
-              item: list[selectedIndex],
+              item: list[dragValues.selectedIndex],
             })}
         </Animated.View>
       )}
@@ -301,6 +301,7 @@ const List = ({
           ) {
             dragValues.currLongPressedId = index;
           }
+          const isDragging = index === selectedIndex && mode === "DRAGGING";
           return (
             <View
               {...(draggable ? panResponder.panHandlers : {})}
@@ -315,7 +316,7 @@ const List = ({
               {flatListProps.renderItem &&
                 flatListProps.renderItem({
                   item,
-                  isDragging: index === selectedIndex && mode === "DRAGGING",
+                  isDragging,
                   longPress,
                   pressed,
                 })}
