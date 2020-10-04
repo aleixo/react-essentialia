@@ -111,9 +111,10 @@ const List = ({
 
         // Long press interval
         dragValues.longPressInterval = setTimeout(() => {
-          Animated.event([{ y: draggablePos.y }], { useNativeDriver: false })({
-            y: gestureState.y0 - dragValues.itemHeights[currIndex] / 2,
-          });
+          Animated.event(
+            [{ nativeEvent: { contentOffset: { y: draggablePos.y } } }],
+            { useNativeDriver: true }
+          );
 
           dragValues.selectedIndex = currIndex;
           startDragging(currIndex);
